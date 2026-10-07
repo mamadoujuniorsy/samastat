@@ -49,7 +49,7 @@ reformulations que le catalogue peut satisfaire.
 ### Jalon 3 (données réelles)
 
 - Cache Redis des réponses aux questions isolées (6 h), dégradation silencieuse si Redis est absent
-- Indexation sémantique en tâche de fond : file BullMQ sur Redis (repli en processus sans Redis), auto-réparation au démarrage, `GET /admin/index` pour l'état, `POST /admin/reindex` protégé par `SAMASTAT_ADMIN_TOKEN`
+- Indexation sémantique en tâche de fond : file BullMQ sur Redis (repli en processus sans Redis), auto-réparation au démarrage, `GET /admin/index` pour l'état, `POST /admin/reindex` protégé par une session du personnel ANSD
 - Connecteur Plateforme Open Data : bloqué par un challenge Cloudflare, voir `docs/sources-donnees.md`
 
 ### Jalon 4 (visualisation, export)
@@ -70,6 +70,10 @@ reformulations que le catalogue peut satisfaire.
 Prérequis : Node 22+, Docker, et au moins une clé de modèle : `ANTHROPIC_API_KEY` (principal) ou `GROQ_API_KEY`
 (repli, gratuit sur console.groq.com). Avec les deux, Anthropic répond et Groq prend le relais automatiquement
 en cas de clé invalide, de quota atteint ou de panne.
+
+Pour une installation destinée à l'ANSD ou à un serveur, suivre en priorité le
+[guide de déploiement Docker](./DEPLOYMENT.md). Il décrit le parcours complet depuis
+un clone propre, l'initialisation du catalogue, la vérification et le dépannage.
 
 ```bash
 npm install
@@ -104,6 +108,8 @@ curl -X POST localhost:3001/ask -H 'content-type: application/json' \
 ```
 
 ## Déploiement Docker (API + web + base + Redis)
+
+La procédure complète et les vérifications sont dans [DEPLOYMENT.md](./DEPLOYMENT.md).
 
 ```bash
 cp .env.example .env                       # renseigner ANTHROPIC_API_KEY et/ou GROQ_API_KEY
