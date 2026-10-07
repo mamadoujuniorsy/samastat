@@ -7,8 +7,8 @@ La méthode recommandée pour la démonstration et la reprise par l'ANSD est Doc
 
 - Git
 - Docker Engine avec le plugin Docker Compose
-- Au moins 4 Go de RAM disponibles (8 Go recommandés pour l'indexation)
-- Environ 3 Go d'espace disque libre pour les images, les données et le modèle d'embeddings
+- Au moins 8 Go de RAM disponibles (16 Go recommandés avec Kiriku)
+- Environ 5 Go d'espace disque libre pour les images, les données et les modèles locaux
 - Une clé `ANTHROPIC_API_KEY` ou `GROQ_API_KEY` pour poser de vraies questions
 
 Le premier indexage télécharge un modèle local d'embeddings. Il peut prendre quelques minutes.
@@ -37,7 +37,19 @@ GROQ_API_KEY=
 ```
 
 Une seule des deux clés suffit. Avec les deux clés, Anthropic est utilisé en priorité
-et Groq sert de repli automatique.
+et Groq sert de repli automatique pour le LLM et les transcriptions non Wolof.
+
+Pour activer la transcription Wolof locale, renseigner si nécessaire le jeton Hugging
+Face demandé par le dépôt Kiriku :
+
+```dotenv
+HUGGINGFACE_HUB_TOKEN=
+SAMASTAT_ASR_MODEL=AIHubSN/kiriku-ASR
+```
+
+Le modèle est téléchargé au premier vocal Wolof et conservé dans le volume
+`samastat-asr-models`. Un GPU n'est pas obligatoire, mais 8 Go de VRAM ou plus
+réduisent fortement la latence.
 
 Pour activer la connexion du personnel ANSD, renseigner aussi :
 
@@ -46,7 +58,8 @@ SAMASTAT_AUTH_SECRET=une-chaine-secrete-longue-et-aleatoire
 ```
 
 Les canaux SMS, WhatsApp, la traduction Wolof locale et la synthèse vocale Wolof sont
-optionnels et restent désactivés tant que leurs variables ne sont pas configurées.
+optionnels. Le service ASR local est inclus dans le profil `app` et traite les vocaux
+explicitement sélectionnés en Wolof.
 
 ## 4. Construire et démarrer les services
 
@@ -60,6 +73,7 @@ Les services démarrés sont :
 |---|---:|---|
 | `web` | `http://localhost:3000` | Interface web |
 | `api` | `http://localhost:3001` | API NestJS |
+| `asr` | `http://localhost:8000` | Transcription Wolof locale |
 | `postgres` | `localhost:5440` | PostgreSQL + pgvector |
 | `redis` | `localhost:6390` | Cache et file d'indexation |
 
@@ -96,6 +110,16 @@ curl http://localhost:3001/health
 
 La réponse doit contenir `"ok": true`, un nombre d'indicateurs supérieur à zéro
 et un nombre d'études supérieur à zéro.
+
+Vérifier aussi le service ASR local :
+
+```bash
+curl http://localhost:8000/health
+```
+
+La réponse doit indiquer `"status": "ok"`. Le champ `"loaded": false` avant le
+premier vocal est normal : Kiriku est chargé à la demande, puis conservé dans
+le volume `samastat-asr-models`.
 
 Vérifier l'index sémantique :
 
@@ -241,4 +265,3 @@ Puis reprendre à l'étape 5.
 - La traduction et la synthèse vocale Wolof sont optionnelles et nécessitent davantage
   de mémoire lorsqu'elles sont activées.
 - La commande `index` est nécessaire avant d'obtenir la recherche sémantique complète.
-

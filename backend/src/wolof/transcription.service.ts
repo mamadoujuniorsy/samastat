@@ -34,11 +34,11 @@ export const AUDIO_MIME_TYPES = [
 ] as const;
 
 const WOLOF_PROMPT =
-  'Transcrire fidèlement en wolof parlé au Sénégal (alphabet latin), sans traduire en français. Question statistique : Dakar, Thiès, Diourbel, Saint-Louis, Ziguinchor, ANSD, RGPH.';
+  'Transcrire fidèlement en wolof parlé au Sénégal (alphabet latin avec lettres ñ, ë, ó, à), sans traduire en français. Questions statistiques ANSD, RGPH-5, démographie, population, économie. Exemples : Ñaata nit ñoo dëkk Dakar ? Askanu Senegaal ñaata la tollu ? Lan mooy taux de chômage bi ? Négég, liggéey, ndóol, diiwaan, Ndakaaru, Thiès, Diourbel, Fatick, Kaolack, Kolda, Louga, Matam, Saint-Louis, Sédhiou, Tambacounda, Kédougou, Ziguinchor.';
 const FRENCH_PROMPT =
-  'Question statistique sur le Sénégal. Transcrire en français. Noms : Dakar, Thiès, Diourbel, Saint-Louis, Ziguinchor, ANSD, RGPH.';
+  'Question statistique sur le Sénégal. Transcrire fidèlement en français. ANSD, RGPH-5, EHCVM, ENES, IHPC, Dakar, Thiès, Diourbel, Saint-Louis, Ziguinchor, population, taux de chômage, inflation, pauvreté, espérance de vie.';
 const AUTO_PROMPT =
-  'Question statistique posée au Sénégal, en français ou en wolof. Transcrire fidèlement la langue parlée, sans traduire.';
+  'Question statistique posée au Sénégal, en wolof ou en français. Transcrire fidèlement la langue parlée (alphabet latin), sans traduire. Mots-clés : ANSD, RGPH, Dakar, Ndakaaru, Thiès, askan, nit, ñaata, liggéey, chômage, population, inflation, njëg, diiwaan.';
 
 @Injectable()
 export class TranscriptionService {
@@ -47,7 +47,11 @@ export class TranscriptionService {
   constructor(private readonly config: ConfigService) {}
 
   get available(): boolean {
-    return Boolean(this.apiKey);
+    return Boolean(this.localAsrUrl || this.apiKey);
+  }
+
+  get localAvailable(): boolean {
+    return Boolean(this.localAsrUrl);
   }
 
   async transcribe(
@@ -62,12 +66,16 @@ export class TranscriptionService {
     if (!isAcceptedAudioMime(mime)) {
       throw new TranscriptionError('Format audio non pris en charge.', 'format');
     }
-    const apiKey = this.apiKey;
-    if (!apiKey) {
-      throw new TranscriptionError('La dictée vocale nécessite une clé Groq configurée côté serveur.', 'unavailable');
+    const hint = parseVoiceLanguage(language);
+    const localUrl = this.localAsrUrl;
+    if (localUrl && hint === 'wo') {
+      return this.transcribeLocal(file, mime, localUrl);
     }
 
-    const hint = parseVoiceLanguage(language);
+    const apiKey = this.apiKey;
+    if (!apiKey) {
+      throw new TranscriptionError('La transcription locale Wolof est indisponible et aucune clé Groq de secours n’est configurée.', 'unavailable');
+    }
     const form = new FormData();
     form.append(
       'file',
@@ -119,6 +127,41 @@ export class TranscriptionService {
 
   private get apiKey(): string | undefined {
     return groqTranscriptionKey((key) => this.config.get<string>(key));
+  }
+
+  private get localAsrUrl(): string | undefined {
+    return this.config.get<string>('SAMASTAT_LOCAL_ASR_URL')?.trim() || undefined;
+  }
+
+  private async transcribeLocal(
+    file: { buffer: Buffer; mimetype: string; originalname?: string },
+    mime: string,
+    baseUrl: string,
+  ): Promise<{ text: string; language: 'fr' | 'wo' }> {
+    const form = new FormData();
+    form.append(
+      'audio',
+      new Blob([new Uint8Array(file.buffer)], { type: mime }),
+      safeAudioFilename(file.originalname ?? 'vocal', mime),
+    );
+    let response: globalThis.Response;
+    try {
+      response = await fetch(`${baseUrl.replace(/\/$/, '')}/transcribe`, {
+        method: 'POST',
+        body: form,
+        signal: AbortSignal.timeout(90_000),
+      });
+    } catch {
+      throw new TranscriptionError('Le moteur local de transcription Wolof est injoignable.', 'unavailable');
+    }
+    const result = (await response.json().catch(() => null)) as { text?: unknown; detail?: string } | null;
+    if (!response.ok || typeof result?.text !== 'string') {
+      this.logger.warn(`ASR local refusé (${response.status}) : ${result?.detail ?? ''}`.trim());
+      throw new TranscriptionError('La transcription locale Wolof a échoué.', 'failed');
+    }
+    const text = result.text.trim();
+    if (text.length < 2) throw new TranscriptionError('Aucune parole Wolof reconnue.', 'failed');
+    return { text, language: 'wo' };
   }
 }
 

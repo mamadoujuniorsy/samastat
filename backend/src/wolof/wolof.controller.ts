@@ -34,7 +34,11 @@ export class WolofController {
   @ApiOperation({ summary: 'Disponibilité des services wolof (traduction, voix) et modèles utilisés' })
   status() {
     return {
-      transcription: { enabled: this.transcription.available, provider: 'groq', model: 'whisper-large-v3-turbo' },
+      transcription: {
+        enabled: this.transcription.available,
+        provider: this.transcription.localAvailable ? 'local-kiriku' : 'groq',
+        model: this.transcription.localAvailable ? 'AIHubSN/kiriku-ASR' : 'whisper-large-v3-turbo',
+      },
       translation: { enabled: this.translation.available, model: TRANSLATION_MODEL, licence: 'CC BY-NC 4.0' },
       tts: { enabled: this.tts.available, model: WOLOF_TTS_MODEL, licence: 'CC BY-NC 4.0', experimental: true },
     };

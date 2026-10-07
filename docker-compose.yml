@@ -40,6 +40,7 @@ services:
       DATABASE_URL: postgres://samastat:samastat@postgres:5432/samastat
       REDIS_URL: redis://redis:6379
       FRONTEND_ORIGIN: http://localhost:3000
+      SAMASTAT_LOCAL_ASR_URL: http://asr:8000
     ports:
       - "3001:3001"
     volumes:
@@ -49,6 +50,28 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
+      asr:
+        condition: service_started
+
+  asr:
+    profiles: ["app"]
+    build:
+      context: .
+      dockerfile: asr/Dockerfile
+    container_name: samastat-asr
+    environment:
+      SAMASTAT_ASR_MODEL: ${SAMASTAT_ASR_MODEL:-AIHubSN/kiriku-ASR}
+      SAMASTAT_ASR_CACHE: /models
+      HUGGINGFACE_HUB_TOKEN: ${HUGGINGFACE_HUB_TOKEN:-}
+    ports:
+      - "8000:8000"
+    volumes:
+      - samastat-asr-models:/models
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 10
 
   web:
     profiles: ["app"]
@@ -69,3 +92,4 @@ services:
 volumes:
   samastat-pgdata:
   samastat-models:
+  samastat-asr-models:

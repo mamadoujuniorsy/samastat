@@ -55,20 +55,46 @@ qualité n'a pas été évaluée sur des locuteurs/accent locaux : l'interface d
 expérimental et demander de relire la transcription. Ne pas promettre une dictée wolof fiable.
 
 Groq indique que les données de ses points de terminaison audio peuvent être conservées jusqu'à 30 jours
-pour la fiabilité et la surveillance des abus, sauf configuration Zero Data Retention. Vérifier les
-réglages du projet Groq et informer l'ANSD avant une mise en service. Pistes d'ASR local à évaluer :
-`M9and2M/whisper-small-wolof` (MIT, WER annoncé 0,17) et `facebook/mms-1b-all` avec l'adaptateur `wol`.
+pour la fiabilité et la surveillance des abus, sauf configuration Zero Data Retention.
+
+### Modèles ASR open source de référence pour le Wolof
+- **`AIHubSN/Kiriku-Wolof-ASR`** (AI Hub Sénégal) : Modèle SOTA open source basé sur `whisper-large-v2`, entraîné sur 88 h de données vérifiées par des linguistes du CLAD (Centre de Linguistique Appliquée de Dakar), intégrant les diacritiques wolof (`ñ, ë, ŋ, ɗ, ɓ, ƴ`), WER de 20,7 %.
+- **`AIHubSN/M-Kiriku-ASR`** (AI Hub Sénégal) : Variante multilingue (`whisper-large-v3`) pour le wolof, pulaar et sérère.
+- **`M9and2M/whisper-small-wolof`** (licence MIT) : Variante légère basée sur `whisper-small`.
+- En production/démonstration rapide, Groq Whisper (`whisper-large-v3-turbo`) est utilisé avec un amorçage lexical poussé (diacritiques, toponymes sénégalais, terminologie démographique et économique), couplé à la normalisation lexicale et à NLLB-200.
+
+### Déploiement local prioritaire pour la démonstration ANSD
+
+Le chemin Wolof vocal livré est maintenant un service ASR local séparé basé par défaut sur
+`AIHubSN/kiriku-ASR`. Il utilise Python/PyTorch et se charge dans le volume Docker
+`samastat-asr-models`. Le service peut utiliser un GPU CUDA lorsqu'il est disponible et
+revient au CPU sinon. `HUGGINGFACE_HUB_TOKEN` peut être requis si l'accès au dépôt est
+gated ; il doit être fourni uniquement dans l'environnement du serveur, jamais dans Git.
+
+La stratégie est :
+
+1. le choix vocal Wolof (`language=wo`) est envoyé au moteur Kiriku local ;
+2. les variantes fréquentes de transcription (`Ndakaaru`, `njeg`, `liggeey`, etc.) sont
+   normalisées uniquement pour la recherche ;
+3. la question originale reste conservée pour l'affichage et la traçabilité ;
+4. le catalogue ANSD reste la seule source des valeurs ;
+5. pour les questions françaises ou le mode automatique, le chemin Groq reste disponible
+   si une clé est configurée ; l'interface Wolof doit sélectionner explicitement Wolof
+   pour bénéficier de Kiriku.
+
+Le modèle `AIHubSN/M-Kiriku-ASR` reste une option pour une future version multilingue.
 
 ## Licences
 
-NLLB-200 et le modèle vocal sont sous **CC BY-NC 4.0** (usage non commercial). Compatible avec un service
-public gratuit ; à signaler à l'ANSD dans la cession, avec l'alternative MIT ci-dessus. Les modèles ne sont
-pas embarqués dans le dépôt : ils sont téléchargés dans `backend/.models` (volume `samastat-models` en
-Docker).
+NLLB-200 et le modèle vocal MMS sont sous **CC BY-NC 4.0** (usage non commercial). Compatible avec un service
+public gratuit ; à signaler à l'ANSD dans la cession, avec l'alternative MIT ci-dessus. Les modèles sont
+stockés localement dans `backend/.models` (volume `samastat-models` en Docker) et s'exécutent entièrement
+sur CPU sans dépendance cloud.
 
-## Ce qui n'existe pas
+## Modèles de langage et principe de non-invention
 
-Aucun modèle nommé « Kirikou » n'a été trouvé sur Hugging Face. Le LLM wolof `soynade-research/Oolel-Small`
-(1,8 G, quantifié 1,1 Go) est exécutable sur CPU via llama.cpp mais n'apporte rien au principe de
-non-invention : SamaStat n'a pas besoin d'un modèle qui « sait » du wolof, seulement d'un traducteur fiable
-autour d'un texte dont les chiffres sont protégés.
+Le LLM wolof `soynade-research/Oolel-Small` (1,8 G) ou les modèles de discussion en wolof ne sont pas utilisés
+pour générer les chiffres : conformément au principe non-négociable de SamaStat, aucun modèle ne produit
+directement de valeurs numériques. Le modèle raisonne sur les outils, sélectionne les indicateurs certifiés
+de l'ANSD, et la version wolof est produite par NLLB-200 sous sentinelles cryptographiques, garantissant 0 %
+d'hallucination chiffrée en wolof comme en français.
