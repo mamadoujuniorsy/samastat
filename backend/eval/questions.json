@@ -1,0 +1,207 @@
+[
+  {
+    "question": "Quelle est la population du Sénégal ?",
+    "expected_indicator_ids": [
+      "rgph5-2023-population-senegal"
+    ]
+  },
+  {
+    "question": "Combien d'habitants compte la région de Dakar ?",
+    "expected_indicator_ids": [
+      "rgph5-2023-population-region-dakar"
+    ]
+  },
+  {
+    "question": "Population de Thiès en 2023",
+    "expected_indicator_ids": [
+      "rgph5-2023-population-region-thies"
+    ]
+  },
+  {
+    "question": "Combien y a-t-il de femmes au Sénégal selon le recensement ?",
+    "expected_indicator_ids": [
+      "rgph5-2023-population-femmes-senegal"
+    ]
+  },
+  {
+    "question": "Quel est le taux de chômage au Sénégal ?",
+    "expected_indicator_ids": [
+      "enes-t1-2026-chomage-elargi-senegal",
+      "enes-t1-2026-chomage-bit-senegal"
+    ],
+    "note": "l'un ou l'autre est acceptable si la définition est nommée"
+  },
+  {
+    "question": "Le chômage est-il plus élevé en ville ou à la campagne ?",
+    "expected_indicator_ids": [
+      "enes-t1-2026-chomage-elargi-rural",
+      "enes-t1-2026-chomage-elargi-urbain"
+    ]
+  },
+  {
+    "question": "Quelle a été l'inflation en 2024 ?",
+    "expected_indicator_ids": [
+      "ihpc-2024-inflation-senegal"
+    ]
+  },
+  {
+    "question": "Comment a évolué l'inflation entre 2023 et 2025 ?",
+    "expected_indicator_ids": [
+      "ihpc-2023-inflation-senegal",
+      "ihpc-2024-inflation-senegal",
+      "ihpc-2025-inflation-senegal"
+    ]
+  },
+  {
+    "question": "Quel est le taux de pauvreté à Kaolack ?",
+    "expected_indicator_ids": [
+      "ehcvm2-2021-2022-pauvrete-region-kaolack"
+    ]
+  },
+  {
+    "question": "Quelle région est la plus pauvre du Sénégal ?",
+    "expected_indicator_ids": [
+      "ehcvm2-2021-2022-pauvrete-region-kedougou"
+    ],
+    "note": "comparaison : au minimum Kédougou doit figurer"
+  },
+  {
+    "question": "Combien d'enfants par femme au Sénégal ?",
+    "expected_indicator_ids": [
+      "rgph5-2023-isf-senegal"
+    ]
+  },
+  {
+    "question": "Espérance de vie au Sénégal",
+    "expected_indicator_ids": [
+      "rgph5-2023-esperance-vie-senegal"
+    ]
+  },
+  {
+    "question": "Quel est le taux de croissance du PIB en 2024 ?",
+    "expected_indicator_ids": [
+      "cn-2024-croissance-pib-senegal"
+    ]
+  },
+  {
+    "question": "Combien de ménages y a-t-il au Sénégal ?",
+    "expected_indicator_ids": [
+      "rgph5-2023-menages-senegal",
+      "rgph5-2023-menages-ordinaires-senegal"
+    ]
+  },
+  {
+    "question": "Quel est l'âge médian de la population sénégalaise ?",
+    "expected_indicator_ids": [
+      "rgph5-2023-age-median-senegal"
+    ]
+  },
+  {
+    "question": "Taux d'alphabétisation au Sénégal",
+    "expected_indicator_ids": [
+      "rgph5-2023-alphabetisation-6-ans-senegal"
+    ]
+  },
+  {
+    "question": "Combien de bébés meurent avant un an ?",
+    "expected_indicator_ids": [
+      "rgph5-2023-quotient-mortalite-infantile-senegal"
+    ]
+  },
+  {
+    "question": "Population de Ziguinchor",
+    "expected_indicator_ids": [
+      "rgph5-2023-population-region-ziguinchor"
+    ]
+  },
+  {
+    "question": "Ñaata nit ñoo dëkk Dakar ?",
+    "expected_indicator_ids": [
+      "rgph5-2023-population-region-dakar"
+    ],
+    "note": "wolof : population de Dakar"
+  },
+  {
+    "question": "Naata la njëg yi yokku ci 2024 ?",
+    "expected_indicator_ids": [
+      "ihpc-2024-inflation-senegal"
+    ],
+    "note": "wolof : hausse des prix 2024"
+  },
+  {
+    "question": "Quel est le taux de chômage à Dakar ?",
+    "expected_indicator_ids": [],
+    "note": "donnée absente : le chômage n'est pas publié par région dans le catalogue → no_data attendu"
+  },
+  {
+    "question": "Quelle est la population de la commune de Guédiawaye ?",
+    "expected_indicator_ids": [],
+    "note": "niveau commune absent du catalogue → no_data attendu"
+  },
+  {
+    "question": "Combien de médecins y a-t-il au Sénégal ?",
+    "expected_indicator_ids": [],
+    "note": "santé non couverte → no_data attendu"
+  },
+  {
+    "question": "Quel sera le PIB en 2030 ?",
+    "expected_indicator_ids": [],
+    "note": "projection : refus attendu (no_data)"
+  },
+  {
+    "question": "Bonjour, que sais-tu faire ?",
+    "expected_indicator_ids": [],
+    "note": "conversation : aucune valeur"
+  },
+  {
+    "question": "Ñaata ndóol la am ci diiwaanu Kaolack ?",
+    "expected_indicator_ids": [
+      "ehcvm2-2021-2022-pauvrete-region-kaolack"
+    ],
+    "note": "wolof : pauvreté à Kaolack"
+  },
+  {
+    "question": "Quel est le taux de couverture vaccinale des enfants au Sénégal ?",
+    "expected_indicator_ids": [
+      "eds-2023-vaccination-complete-senegal"
+    ]
+  },
+  {
+    "question": "Combien de femmes meurent en accouchant au Sénégal ?",
+    "expected_indicator_ids": [
+      "eds-2023-mortalite-maternelle-senegal"
+    ]
+  },
+  {
+    "question": "Combien y a-t-il de médecins au Sénégal ?",
+    "expected_indicator_ids": [
+      "sesn-2022-medecins-senegal"
+    ]
+  },
+  {
+    "question": "Quelle est la part des enfants qui souffrent de malnutrition chronique ?",
+    "expected_indicator_ids": [
+      "eds-2023-retard-croissance-senegal"
+    ]
+  },
+  {
+    "question": "Quelle est la population du département de Mbour ?",
+    "expected_indicator_ids": [
+      "rgph5-2023-population-departement-mbour"
+    ]
+  },
+  {
+    "question": "Combien d'habitants à Yeumbeul Nord ?",
+    "expected_indicator_ids": [
+      "rgph5-2023-population-commune-yeumbeul-nord"
+    ],
+    "note": "niveau commune"
+  },
+  {
+    "question": "Quel département de la région de Thiès est le plus peuplé ?",
+    "expected_indicator_ids": [
+      "rgph5-2023-population-departement-mbour"
+    ],
+    "note": "comparaison départementale"
+  }
+]

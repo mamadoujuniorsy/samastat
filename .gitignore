@@ -1,0 +1,21 @@
+node_modules/
+dist/
+.next/
+out/
+coverage/
+.env
+.env.local
+.env.*.local
+*.log
+.DS_Store
+Thumbs.db
+
+# Expo (mobile)
+.expo/
+mobile/android/
+mobile/ios/
+mobile/dist/
+mobile/expo-env.d.ts
+
+# Modèles d embeddings téléchargés localement
+backend/.models/

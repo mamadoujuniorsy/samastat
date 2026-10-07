@@ -1,0 +1,33 @@
+{
+  "name": "samastat",
+  "private": true,
+  "description": "SamaStat — assistant statistique conversationnel du Sénégal (données ANSD)",
+  "license": "MIT",
+  "workspaces": [
+    "backend",
+    "frontend",
+    "mobile"
+  ],
+  "scripts": {
+    "db:up": "docker compose up -d postgres redis",
+    "db:down": "docker compose down",
+    "db:migrate": "npm run --workspace backend db:migrate",
+    "db:seed": "npm run --workspace backend db:seed",
+    "dev:backend": "npm run --workspace backend start:dev",
+    "dev:frontend": "npm run --workspace frontend dev",
+    "build": "npm run --workspace backend build && npm run --workspace frontend build",
+    "test": "npm run --workspace backend test",
+    "lint": "npm run --workspace backend lint && npm run --workspace frontend lint",
+    "dev:mobile": "npm run --workspace mobile start",
+    "db:index": "npm run --workspace backend db:index",
+    "db:seed:surveys": "npm run --workspace backend db:seed:surveys",
+    "eval": "npm run --workspace backend eval",
+    "eval:search": "npm run --workspace backend eval:search",
+    "staff:add": "npm run --workspace backend staff:add --",
+    "staff:list": "npm run --workspace backend staff:list",
+    "staff:remove": "npm run --workspace backend staff:remove --"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}

@@ -1,0 +1,223 @@
+@import "tailwindcss";
+
+/*
+  Système de design SamaStat (docs/DESIGN.md), révision « finale » :
+  papier chaud, encre profonde, un accent vert institutionnel, un ocre discret pour les filets,
+  serif éditoriale pour les titres et les chiffres-vedettes, sans-serif pour l'interface.
+  Thème clair par défaut ; sombre par [data-theme="dark"] ou préférence système.
+*/
+:root {
+  --bg: #f6f4ee;
+  --bg-elevated: #fbfaf7;
+  --surface: #ffffff;
+  --surface-muted: #efece4;
+  --border: #dcd8cd;
+  --border-strong: #b9b3a4;
+  --text: #171613;
+  --text-muted: #5f5b52;
+  --text-faint: #68645b;
+  --accent: #175c91;
+  --accent-strong: #10466f;
+  --accent-soft: #e6f0f8;
+  --ochre: #b8791f;
+  --ochre-soft: #f6ead6;
+  --danger: #9b1c1c;
+  --danger-soft: #fbe9e9;
+  --focus: #1f5fbf;
+  --shadow: 0 1px 2px rgb(23 22 19 / 0.05), 0 8px 24px -12px rgb(23 22 19 / 0.18);
+}
+
+.chat-home {
+  --bg: #0d0d0e;
+  --bg-elevated: #111112;
+  --surface: #1b1b1d;
+  --surface-muted: #202022;
+  --border: #303033;
+  --border-strong: #4a4a4f;
+  --text: #f4f4f5;
+  --text-muted: #b3b3b8;
+  --text-faint: #929298;
+  --accent: #76a9fa;
+  --accent-strong: #91baff;
+  --accent-soft: #1c2b45;
+  --danger: #ff8989;
+  --danger-soft: #351e20;
+  --focus: #76a9fa;
+  background: var(--bg);
+  color: var(--text);
+  color-scheme: dark;
+}
+
+:root[data-theme="dark"] {
+  --bg: #141517;
+  --bg-elevated: #191b1e;
+  --surface: #1e2024;
+  --surface-muted: #272a2f;
+  --border: #33373d;
+  --border-strong: #545963;
+  --text: #ecebe6;
+  --text-muted: #aaa89f;
+  --text-faint: #aaa89f;
+  --accent: #83b8e3;
+  --accent-strong: #a3cdee;
+  --accent-soft: #1d3344;
+  --ochre: #e0a84a;
+  --ochre-soft: #3a2e1a;
+  --danger: #f08a8a;
+  --danger-soft: #3a1f1f;
+  --focus: #7fb0ff;
+  --shadow: 0 1px 2px rgb(0 0 0 / 0.4), 0 8px 24px -12px rgb(0 0 0 / 0.6);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #141517;
+    --bg-elevated: #191b1e;
+    --surface: #1e2024;
+    --surface-muted: #272a2f;
+    --border: #33373d;
+    --border-strong: #545963;
+    --text: #ecebe6;
+    --text-muted: #aaa89f;
+    --text-faint: #7d7b73;
+    --accent: #83b8e3;
+    --accent-strong: #a3cdee;
+    --accent-soft: #1d3344;
+    --ochre: #e0a84a;
+    --ochre-soft: #3a2e1a;
+    --danger: #f08a8a;
+    --danger-soft: #3a1f1f;
+    --focus: #7fb0ff;
+    --shadow: 0 1px 2px rgb(0 0 0 / 0.4), 0 8px 24px -12px rgb(0 0 0 / 0.6);
+  }
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-bg-elevated: var(--bg-elevated);
+  --color-surface: var(--surface);
+  --color-surface-muted: var(--surface-muted);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-text: var(--text);
+  --color-text-muted: var(--text-muted);
+  --color-text-faint: var(--text-faint);
+  --color-accent: var(--accent);
+  --color-accent-strong: var(--accent-strong);
+  --color-accent-soft: var(--accent-soft);
+  --color-ochre: var(--ochre);
+  --color-ochre-soft: var(--ochre-soft);
+  --color-danger: var(--danger);
+  --color-danger-soft: var(--danger-soft);
+  --color-focus: var(--focus);
+  --font-sans: "IBM Plex Sans", "Segoe UI", Arial, sans-serif;
+  --font-serif: Newsreader, Iowan Old Style, "Palatino Linotype", "Book Antiqua", Georgia, serif;
+  --font-mono: "IBM Plex Mono", "Cascadia Code", Consolas, monospace;
+  --shadow-card: var(--shadow);
+}
+
+html {
+  color-scheme: light;
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+  }
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Le shell web garde une zone de lecture stable sans contraindre les fiches larges. */
+body,
+button,
+input,
+textarea {
+  font-family: var(--font-sans);
+}
+
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+::selection {
+  color: var(--text);
+  background: var(--accent-soft);
+}
+
+@media (max-width: 639px) {
+  html {
+    scroll-padding-top: 4rem;
+  }
+
+  body {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
+
+/* Titres et chiffres-vedettes en serif éditoriale. */
+.display {
+  font-family: var(--font-serif);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  line-height: 1.1;
+}
+
+/* Les valeurs chiffrées s'alignent en colonnes. */
+.tabular {
+  font-variant-numeric: tabular-nums lining-nums;
+}
+
+.headline-value {
+  font-family: var(--font-serif);
+  font-size: clamp(2.25rem, 5vw, 3.25rem);
+  line-height: 1;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums lining-nums;
+}
+
+/* Filet ocre court, marque des sections éditoriales. */
+.rule::before {
+  content: "";
+  display: block;
+  width: 2rem;
+  height: 2px;
+  background: var(--ochre);
+  margin-bottom: 0.75rem;
+}
+
+:where(a, button, input, select, summary, [tabindex]):focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+/* Le champ de question signale le focus par la bordure de son conteneur (focus-within), pas par un anneau interne. */
+textarea:focus,
+textarea:focus-visible {
+  outline: none;
+}
+
+summary {
+  list-style: none;
+  cursor: pointer;
+}
+summary::-webkit-details-marker {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+    transition: none !important;
+  }
+}

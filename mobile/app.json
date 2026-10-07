@@ -1,0 +1,41 @@
+{
+  "expo": {
+    "name": "SamaStat",
+    "slug": "samastat",
+    "scheme": "samastat",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "automatic",
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "sn.ansd.samastat",
+      "infoPlist": {
+        "CFBundleDevelopmentRegion": "fr"
+      }
+    },
+    "android": {
+      "package": "sn.ansd.samastat",
+      "adaptiveIcon": {
+        "backgroundColor": "#E3F1E9",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
+      "predictiveBackGestureEnabled": false
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      [
+        "expo-speech-recognition",
+        {
+          "microphonePermission": "SamaStat utilise le micro pour dicter votre question.",
+          "speechRecognitionPermission": "SamaStat utilise la reconnaissance vocale pour transcrire votre question."
+        }
+      ],
+      "expo-audio"
+    ]
+  }
+}

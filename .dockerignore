@@ -1,0 +1,12 @@
+**/node_modules
+**/dist
+**/.next
+**/.expo
+**/.models
+mobile/*
+!mobile/package.json
+docs
+.env
+.env.*
+!.env.example
+*.log

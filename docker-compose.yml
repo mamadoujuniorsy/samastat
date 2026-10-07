@@ -1,0 +1,71 @@
+services:
+  postgres:
+    image: pgvector/pgvector:pg17
+    container_name: samastat-postgres
+    environment:
+      POSTGRES_USER: samastat
+      POSTGRES_PASSWORD: samastat
+      POSTGRES_DB: samastat
+    ports:
+      - "5440:5432"
+    volumes:
+      - samastat-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U samastat -d samastat"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    container_name: samastat-redis
+    ports:
+      - "6390:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  # Déploiement complet : docker compose --profile app up -d --build
+  # puis, une fois : docker compose exec api npx tsx scripts/db.ts migrate (idem seed, index)
+  api:
+    profiles: ["app"]
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    container_name: samastat-api
+    env_file: .env
+    environment:
+      DATABASE_URL: postgres://samastat:samastat@postgres:5432/samastat
+      REDIS_URL: redis://redis:6379
+      FRONTEND_ORIGIN: http://localhost:3000
+    ports:
+      - "3001:3001"
+    volumes:
+      - samastat-models:/models
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  web:
+    profiles: ["app"]
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+      args:
+        NEXT_PUBLIC_API_URL: http://api:3001
+    container_name: samastat-web
+    environment:
+      # Adresse de l'API vue depuis le conteneur web (relais serveur), modifiable sans reconstruire.
+      API_URL: http://api:3001
+    ports:
+      - "3000:3000"
+    depends_on:
+      - api
+
+volumes:
+  samastat-pgdata:
+  samastat-models:

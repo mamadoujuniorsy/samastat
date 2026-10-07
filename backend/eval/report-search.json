@@ -1,0 +1,261 @@
+{
+  "ranAt": "2026-09-19T14:44:11.475Z",
+  "n": 28,
+  "top3": 27,
+  "top10": 28,
+  "mrr": 0.8071428571428572,
+  "rows": [
+    {
+      "question": "Quelle est la population du Sénégal ?",
+      "rank": 1,
+      "top": [
+        "rgph5-2023-population-senegal",
+        "projections-2025-population-estimee-senegal",
+        "rgph5-2023-population-hommes-senegal"
+      ]
+    },
+    {
+      "question": "Combien d'habitants compte la région de Dakar ?",
+      "rank": 2,
+      "top": [
+        "rgph5-2023-population-departement-dakar",
+        "rgph5-2023-population-region-dakar",
+        "rgph5-2023-population-departement-guediawaye"
+      ]
+    },
+    {
+      "question": "Population de Thiès en 2023",
+      "rank": 2,
+      "top": [
+        "rgph5-2023-population-departement-thies",
+        "rgph5-2023-population-region-thies",
+        "rgph5-2023-population-departement-mbour"
+      ]
+    },
+    {
+      "question": "Combien y a-t-il de femmes au Sénégal selon le recensement ?",
+      "rank": 1,
+      "top": [
+        "rgph5-2023-population-femmes-senegal",
+        "rgph5-2023-population-senegal",
+        "eds-2023-fecondite-adolescentes-senegal"
+      ]
+    },
+    {
+      "question": "Quel est le taux de chômage au Sénégal ?",
+      "rank": 2,
+      "top": [
+        "enes-t1-2026-chomage-elargi-rural",
+        "enes-t1-2026-chomage-elargi-senegal",
+        "enes-t1-2026-chomage-elargi-urbain"
+      ]
+    },
+    {
+      "question": "Le chômage est-il plus élevé en ville ou à la campagne ?",
+      "rank": 1,
+      "top": [
+        "enes-t1-2026-chomage-elargi-urbain",
+        "enes-t1-2026-chomage-elargi-rural",
+        "enes-t1-2026-taux-participation-senegal"
+      ]
+    },
+    {
+      "question": "Quelle a été l'inflation en 2024 ?",
+      "rank": 2,
+      "top": [
+        "cn-2024-taux-epargne-nationale-senegal",
+        "ihpc-2024-inflation-senegal",
+        "ihpc-2026-08-inflation-glissement-senegal"
+      ]
+    },
+    {
+      "question": "Comment a évolué l'inflation entre 2023 et 2025 ?",
+      "rank": 2,
+      "top": [
+        "rgph5-2013-2023-taux-croissance-senegal",
+        "ihpc-2025-inflation-senegal",
+        "ihpc-2026-08-inflation-glissement-senegal"
+      ]
+    },
+    {
+      "question": "Quel est le taux de pauvreté à Kaolack ?",
+      "rank": 1,
+      "top": [
+        "ehcvm2-2021-2022-pauvrete-region-kaolack",
+        "ehcvm2-2021-2022-pauvrete-rural",
+        "ehcvm2-2021-2022-pauvrete-urbain"
+      ]
+    },
+    {
+      "question": "Quelle région est la plus pauvre du Sénégal ?",
+      "rank": 10,
+      "top": [
+        "ehcvm2-2021-2022-pauvrete-region-dakar",
+        "ehcvm2-2021-2022-pauvrete-region-diourbel",
+        "rgph5-2023-part-65-ans-plus-senegal"
+      ]
+    },
+    {
+      "question": "Combien d'enfants par femme au Sénégal ?",
+      "rank": 1,
+      "top": [
+        "rgph5-2023-isf-senegal",
+        "eds-2023-fecondite-adolescentes-senegal",
+        "eds-2023-contraception-moderne-senegal"
+      ]
+    },
+    {
+      "question": "Espérance de vie au Sénégal",
+      "rank": 1,
+      "top": [
+        "rgph5-2023-esperance-vie-senegal",
+        "ehcvm2-2021-2022-pauvrete-senegal",
+        "rgph5-2023-isf-senegal"
+      ]
+    },
+    {
+      "question": "Quel est le taux de croissance du PIB en 2024 ?",
+      "rank": 1,
+      "top": [
+        "cn-2024-croissance-pib-senegal",
+        "cn-2023-croissance-pib-senegal",
+        "cn-2024-croissance-hors-petrole-senegal"
+      ]
+    },
+    {
+      "question": "Combien de ménages y a-t-il au Sénégal ?",
+      "rank": 1,
+      "top": [
+        "rgph5-2023-menages-ordinaires-senegal",
+        "rgph5-2023-menages-senegal",
+        "rgph5-2023-taille-menage-senegal"
+      ]
+    },
+    {
+      "question": "Quel est l'âge médian de la population sénégalaise ?",
+      "rank": 1,
+      "top": [
+        "rgph5-2023-age-median-senegal",
+        "rgph5-2023-age-moyen-senegal",
+        "rgph5-2023-ratio-dependance-senegal"
+      ]
+    },
+    {
+      "question": "Taux d'alphabétisation au Sénégal",
+      "rank": 1,
+      "top": [
+        "rgph5-2023-alphabetisation-6-ans-senegal",
+        "rgph5-2023-tbs-primaire-senegal",
+        "enes-t1-2026-taux-participation-senegal"
+      ]
+    },
+    {
+      "question": "Combien de bébés meurent avant un an ?",
+      "rank": 1,
+      "top": [
+        "rgph5-2023-quotient-mortalite-infantile-senegal",
+        "eds-2023-mortalite-infanto-juvenile-senegal",
+        "eds-2023-mortalite-infantile-senegal"
+      ]
+    },
+    {
+      "question": "Population de Ziguinchor",
+      "rank": 2,
+      "top": [
+        "rgph5-2023-population-departement-ziguinchor",
+        "rgph5-2023-population-region-ziguinchor",
+        "rgph5-2023-population-departement-oussouye"
+      ]
+    },
+    {
+      "question": "Ñaata nit ñoo dëkk Dakar ?",
+      "rank": 2,
+      "top": [
+        "rgph5-2023-population-departement-dakar",
+        "rgph5-2023-population-region-dakar",
+        "rgph5-2023-population-departement-guediawaye"
+      ]
+    },
+    {
+      "question": "Naata la njëg yi yokku ci 2024 ?",
+      "rank": 1,
+      "top": [
+        "ihpc-2024-inflation-senegal",
+        "ihpc-2025-inflation-senegal",
+        "ihpc-2023-inflation-senegal"
+      ]
+    },
+    {
+      "question": "Ñaata ndóol la am ci diiwaanu Kaolack ?",
+      "rank": 1,
+      "top": [
+        "ehcvm2-2021-2022-pauvrete-region-kaolack",
+        "rgph5-2023-population-departement-kaolack",
+        "rgph5-2023-population-departement-guinguineo"
+      ]
+    },
+    {
+      "question": "Quel est le taux de couverture vaccinale des enfants au Sénégal ?",
+      "rank": 1,
+      "top": [
+        "eds-2023-vaccination-complete-senegal",
+        "eds-2023-retard-croissance-senegal",
+        "rgph5-2023-tbs-primaire-senegal"
+      ]
+    },
+    {
+      "question": "Combien de femmes meurent en accouchant au Sénégal ?",
+      "rank": 2,
+      "top": [
+        "eds-2023-accouchement-assiste-senegal",
+        "eds-2023-mortalite-maternelle-senegal",
+        "eds-2023-contraception-moderne-senegal"
+      ]
+    },
+    {
+      "question": "Combien y a-t-il de médecins au Sénégal ?",
+      "rank": 1,
+      "top": [
+        "sesn-2022-medecins-senegal",
+        "sesn-2022-centres-sante-senegal",
+        "sesn-2022-postes-sante-senegal"
+      ]
+    },
+    {
+      "question": "Quelle est la part des enfants qui souffrent de malnutrition chronique ?",
+      "rank": 1,
+      "top": [
+        "eds-2023-retard-croissance-senegal",
+        "eds-2023-insuffisance-ponderale-senegal",
+        "eds-2023-emaciation-senegal"
+      ]
+    },
+    {
+      "question": "Quelle est la population du département de Mbour ?",
+      "rank": 1,
+      "top": [
+        "rgph5-2023-population-departement-mbour",
+        "rgph5-2023-population-departement-bambey",
+        "rgph5-2023-population-departement-mbacke"
+      ]
+    },
+    {
+      "question": "Combien d'habitants à Yeumbeul Nord ?",
+      "rank": 1,
+      "top": [
+        "rgph5-2023-population-commune-yeumbeul-nord",
+        "rgph5-2023-population-commune-yeumbeul-sud",
+        "rgph5-2023-population-departement-koungheul"
+      ]
+    },
+    {
+      "question": "Quel département de la région de Thiès est le plus peuplé ?",
+      "rank": 2,
+      "top": [
+        "rgph5-2023-population-departement-thies",
+        "rgph5-2023-population-departement-mbour",
+        "rgph5-2023-population-departement-tivaouane"
+      ]
+    }
+  ]
+}
