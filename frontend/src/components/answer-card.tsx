@@ -80,16 +80,34 @@ export function AnswerCard({ exchange, pending, onAsk, onRetry, autoSpeakLanguag
       {single && <Headline record={single} />}
 
       {response.answerWolof ? (
-        <div className="space-y-2">
-          <p className="text-base leading-relaxed whitespace-pre-wrap" lang="wo">
-            {response.answerWolof}
-          </p>
-          <p className="text-sm leading-relaxed whitespace-pre-wrap text-text-muted" lang="fr">
-            {response.answer}
-          </p>
+        <div className="space-y-3">
+          {response.meta.language === "wo" ? (
+            <>
+              <p className="text-base font-medium leading-relaxed whitespace-pre-wrap" lang="wo">
+                {response.answerWolof}
+              </p>
+              <div className="rounded-xl border border-border/60 bg-surface-muted/40 p-3 space-y-1">
+                <span className="text-[11px] font-semibold text-text-muted uppercase tracking-wider">Version française</span>
+                <p className="text-sm leading-relaxed whitespace-pre-wrap text-text-muted" lang="fr">
+                  {response.answer}
+                </p>
+              </div>
+            </>
+          ) : (
+            <>
+              <p className="text-[17px] leading-relaxed whitespace-pre-wrap" lang="fr">
+                {response.answer}
+              </p>
+              <div className="rounded-xl border border-border/60 bg-surface-muted/40 p-3 space-y-1">
+                <span className="text-[11px] font-semibold text-accent uppercase tracking-wider">Traduction wolof (ANSD)</span>
+                <p className="text-sm font-medium leading-relaxed whitespace-pre-wrap text-text" lang="wo">
+                  {response.answerWolof}
+                </p>
+              </div>
+            </>
+          )}
           <p className="text-xs text-text-muted">
-            Wolof produit par traduction automatique locale (NLLB-200) à partir de la réponse française ; les valeurs,
-            périodes et sources ne passent pas par le traducteur.
+            Wolof produit par traduction automatique locale (NLLB-200) ; les valeurs, périodes et sources ne passent pas par le traducteur.
           </p>
         </div>
       ) : (
@@ -332,6 +350,7 @@ function Actions({ response }: { response: Exchange["response"] & object }) {
 /** Lecture de la réponse dans la langue demandée à l'oral. */
 function VoiceResponse({ response, autoSpeakLanguage }: { response: Exchange["response"] & object; autoSpeakLanguage?: "fr" | "wo" }) {
   const [state, setState] = useState<"idle" | "loading" | "playing" | "error">("idle");
+  const [activeLang, setActiveLang] = useState<"fr" | "wo" | null>(null);
   const [message, setMessage] = useState("");
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const speechStopRef = useRef<(() => void) | null>(null);
@@ -348,6 +367,7 @@ function VoiceResponse({ response, autoSpeakLanguage }: { response: Exchange["re
     speechStopRef.current?.();
     speechStopRef.current = null;
     setState("idle");
+    setActiveLang(null);
   }, []);
 
   const play = useCallback(async (language: "fr" | "wo") => {
@@ -357,10 +377,12 @@ function VoiceResponse({ response, autoSpeakLanguage }: { response: Exchange["re
     abortRef.current?.abort();
     setMessage("");
     setState("loading");
+    setActiveLang(language);
 
     if (language === "wo") {
       if (!response.answerWolof) {
         setState("error");
+        setActiveLang(null);
         setMessage("Réponse vocale wolof indisponible pour cette réponse.");
         return;
       }
@@ -378,21 +400,23 @@ function VoiceResponse({ response, autoSpeakLanguage }: { response: Exchange["re
         objectUrlRef.current = url;
         const audio = new Audio(url);
         audioRef.current = audio;
-        audio.onended = () => { setState("idle"); URL.revokeObjectURL(url); objectUrlRef.current = null; audioRef.current = null; };
-        audio.onerror = () => { setState("error"); setMessage("La lecture audio a échoué."); URL.revokeObjectURL(url); objectUrlRef.current = null; };
+        audio.onended = () => { setState("idle"); setActiveLang(null); URL.revokeObjectURL(url); objectUrlRef.current = null; audioRef.current = null; };
+        audio.onerror = () => { setState("error"); setActiveLang(null); setMessage("La lecture audio a échoué."); URL.revokeObjectURL(url); objectUrlRef.current = null; };
         await audio.play();
         setState("playing");
       } catch (error) {
         if (controller.signal.aborted) return;
         setState("error");
+        setActiveLang(null);
         setMessage(error instanceof Error ? error.message : "Synthèse vocale indisponible.");
       }
       return;
     }
 
-    const cancel = speak(response.answer, () => setState("idle"), "fr");
+    const cancel = speak(response.answer, () => { setState("idle"); setActiveLang(null); }, "fr-FR");
     if (!cancel) {
       setState("error");
+      setActiveLang(null);
       setMessage("La synthèse vocale française n’est pas disponible dans ce navigateur.");
       return;
     }
@@ -409,19 +433,50 @@ function VoiceResponse({ response, autoSpeakLanguage }: { response: Exchange["re
 
   useEffect(() => () => stop(), [stop]);
 
-  const toggle = () => {
-    if (state === "playing") {
-      stop();
-      return;
-    }
-    setState("idle");
-    setMessage("");
-    void play(autoSpeakLanguage ?? (response.answerWolof ? "wo" : "fr"));
-  };
-
   return (
-    <span className="inline-flex flex-wrap items-center gap-x-2">
-      <ActionButton label={state === "loading" ? "Préparation de la voix…" : state === "playing" ? "Arrêter la lecture" : "Écouter la réponse"} onClick={toggle} active={state === "playing"} />
+    <span className="inline-flex flex-wrap items-center gap-x-2.5">
+      {response.answerWolof ? (
+        <>
+          <ActionButton
+            label={
+              state === "loading" && activeLang === "wo"
+                ? "Préparation voix wolof…"
+                : state === "playing" && activeLang === "wo"
+                  ? "Arrêter la voix wolof"
+                  : "Écouter en wolof"
+            }
+            onClick={() => {
+              if (state === "playing" && activeLang === "wo") stop();
+              else void play("wo");
+            }}
+            active={state === "playing" && activeLang === "wo"}
+          />
+          <span className="text-text-muted/40 select-none" aria-hidden="true">·</span>
+          <ActionButton
+            label={
+              state === "loading" && activeLang === "fr"
+                ? "Préparation voix française…"
+                : state === "playing" && activeLang === "fr"
+                  ? "Arrêter la voix française"
+                  : "Écouter en français"
+            }
+            onClick={() => {
+              if (state === "playing" && activeLang === "fr") stop();
+              else void play("fr");
+            }}
+            active={state === "playing" && activeLang === "fr"}
+          />
+        </>
+      ) : (
+        <ActionButton
+          label={state === "loading" ? "Préparation de la voix…" : state === "playing" ? "Arrêter la lecture" : "Écouter la réponse"}
+          onClick={() => {
+            if (state === "playing") stop();
+            else void play("fr");
+          }}
+          active={state === "playing"}
+        />
+      )}
       {state === "loading" && <span className="sr-only" role="status" aria-live="polite">Préparation de la réponse vocale</span>}
       {message && <span className="text-xs text-text-muted" role="status">{message}</span>}
     </span>

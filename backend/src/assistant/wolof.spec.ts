@@ -12,6 +12,11 @@ describe('detectLanguage', () => {
     expect(detectLanguage('Naata nit la ci Senegaal ?')).toBe('wo');
   });
 
+  it('reconnaît le wolof quand les diacritiques sont partiels', () => {
+    expect(detectLanguage('Ñaata nit ñoo dekk Dakar ?')).toBe('wo');
+    expect(detectLanguage('Lan mooy taux bi ci Senegaal ?')).toBe('wo');
+  });
+
   it('renvoie unknown pour une salutation neutre', () => {
     expect(detectLanguage('Bonjour')).toBe('unknown');
   });
