@@ -120,7 +120,24 @@ export function detectLanguage(question: string): Language {
 
 /** Note ajoutée au message utilisateur pour aider la recherche : formes wolof → mots-clés français. */
 export function searchHints(question: string): string | null {
-  const hits = lexiconHits(question);
+  const hits = lexiconHits(normalizeWolofForSearch(question));
   if (!hits.length) return null;
   return hits.map((h) => `« ${h.form} » → ${h.french}`).join(' ; ');
+}
+
+/**
+ * Normalise uniquement les variantes fréquentes produites par Whisper.
+ * Le texte original reste affiché et envoyé au modèle ; cette version sert
+ * exclusivement à améliorer la recherche dans le catalogue ANSD.
+ */
+export function normalizeWolofForSearch(question: string): string {
+  return question
+    .replace(/\b(?:ndakaaru|ndakaru|dakarou)\b/gi, 'Dakar')
+    .replace(/\b(?:senegaal|senegal)\b/gi, 'Sénégal')
+    .replace(/\b(?:liggeey|ligeey)\b/gi, 'liggéey')
+    .replace(/\b(?:jigeen)\b/gi, 'jigéen')
+    .replace(/\b(?:goor)\b/gi, 'góor')
+    .replace(/\b(?:njeg|njegu)\b/gi, 'njëg')
+    .replace(/\b(?:waññiku|wanñiku)\b/gi, 'wàññiku')
+    .replace(/\b(?:yokku|yokkute)\b/gi, 'yokkute');
 }
