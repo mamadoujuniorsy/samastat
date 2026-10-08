@@ -400,7 +400,9 @@ function VoiceResponse({ response, autoSpeakLanguage }: { response: Exchange["re
         if (controller.signal.aborted) return;
         setState("error");
         setActiveLang(null);
-        setMessage(error instanceof Error ? error.message : "Synthèse vocale indisponible.");
+        setMessage(error instanceof DOMException && error.name === "NotAllowedError"
+          ? "Le navigateur bloque la lecture automatique. Cliquez sur « Écouter en wolof »."
+          : error instanceof Error ? error.message : "Synthèse vocale indisponible.");
       }
       return;
     }
@@ -426,7 +428,13 @@ function VoiceResponse({ response, autoSpeakLanguage }: { response: Exchange["re
   useEffect(() => () => stop(), [stop]);
 
   return (
-    <span className="inline-flex flex-wrap items-center gap-x-2.5">
+    <div className="space-y-1.5">
+      {autoSpeakLanguage && (
+        <p className="text-xs text-accent" role="status" aria-live="polite">
+          Réponse audio en {autoSpeakLanguage === "wo" ? "wolof" : "français"} — la transcription écrite est affichée ci-dessus.
+        </p>
+      )}
+      <span className="inline-flex flex-wrap items-center gap-x-2.5">
       {response.answerWolof ? (
         <>
           <ActionButton
@@ -471,7 +479,8 @@ function VoiceResponse({ response, autoSpeakLanguage }: { response: Exchange["re
       )}
       {state === "loading" && <span className="sr-only" role="status" aria-live="polite">Préparation de la réponse vocale</span>}
       {message && <span className="text-xs text-text-muted" role="status">{message}</span>}
-    </span>
+      </span>
+    </div>
   );
 }
 
