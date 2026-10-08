@@ -11,6 +11,7 @@ import { SmsModule } from './sms/sms.module.js';
 import { WolofModule } from './wolof/wolof.module.js';
 import { AuthModule } from './auth/auth.module.js';
 import { LlmModule } from './llm/llm.module.js';
+import { TelegramModule } from './telegram/telegram.module.js';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { LlmModule } from './llm/llm.module.js';
     WhatsappModule,
     SmsModule,
     WolofModule,
+    TelegramModule,
   ],
   providers: [{ provide: APP_GUARD, useClass: ThrottlerGuard }],
 })

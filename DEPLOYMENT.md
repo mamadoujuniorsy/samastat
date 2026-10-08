@@ -68,8 +68,8 @@ Pour activer la connexion du personnel ANSD, renseigner aussi :
 SAMASTAT_AUTH_SECRET=une-chaine-secrete-longue-et-aleatoire
 ```
 
-Les canaux SMS, WhatsApp, la traduction Wolof locale et la synthèse vocale Wolof sont
-optionnels. Pour obtenir une voix Wolof naturelle, renseigner la clé Soynade :
+Les canaux SMS, WhatsApp et Telegram, la traduction Wolof locale et la synthèse vocale
+Wolof sont optionnels. Pour obtenir une voix Wolof naturelle, renseigner la clé Soynade :
 
 ```dotenv
 SAMASTAT_WOLOF_TTS=0
@@ -83,6 +83,62 @@ que de servir la voix locale expérimentale. Le fallback local ne doit être act
 (`1`) qu'après validation de sa qualité sur la machine de démonstration.
 Le service ASR local est inclus dans le profil `app` et reste disponible pour les
 installations qui choisissent explicitement `SAMASTAT_WOLOF_ASR_PROVIDER=local`.
+
+## 4 bis. Activer WhatsApp et Telegram
+
+Les deux canaux utilisent des webhooks HTTPS publics. Le serveur ANSD doit donc être
+accessible depuis Internet derrière un reverse proxy TLS. Le port interne de l'API reste
+`3001`.
+
+### WhatsApp Cloud API
+
+Renseigner dans `.env` :
+
+```dotenv
+WHATSAPP_VERIFY_TOKEN=un-secret-de-verification
+WHATSAPP_ACCESS_TOKEN=jeton-meta
+WHATSAPP_PHONE_NUMBER_ID=id-du-numero
+WHATSAPP_APP_SECRET=secret-de-l-application-meta
+```
+
+Dans le tableau de bord Meta, configurer l'URL :
+
+```text
+https://votre-domaine.example/whatsapp/webhook
+```
+
+Le jeton de vérification doit correspondre à `WHATSAPP_VERIFY_TOKEN`. Activer au
+minimum l'événement `messages`. Le webhook accepte les questions texte et les vocaux.
+
+### Telegram Bot API
+
+Créer un bot avec `@BotFather`, puis renseigner :
+
+```dotenv
+TELEGRAM_BOT_TOKEN=jeton-du-bot
+TELEGRAM_WEBHOOK_SECRET=secret-long-aleatoire
+```
+
+Après le démarrage de l'API, enregistrer le webhook depuis une machine autorisée :
+
+```bash
+curl -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/setWebhook" \
+  --data-urlencode "url=  https://votre-domaine.example/telegram/webhook" \
+  --data-urlencode "secret_token=${TELEGRAM_WEBHOOK_SECRET}" \
+  --data-urlencode 'allowed_updates=["message"]'
+```
+
+Tester la configuration :
+
+```bash
+curl "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/getWebhookInfo"
+curl http://localhost:3001/telegram/status
+```
+
+Envoyer ensuite un message texte au bot. SamaStat répond avec la réponse de l'agent,
+les valeurs trouvées et les sources ANSD. Les vocaux Telegram ne sont pas activés dans
+ce premier lot afin de garder la démonstration courte et fiable ; WhatsApp conserve
+son support vocal existant.
 
 ## 4. Construire et démarrer les services
 
