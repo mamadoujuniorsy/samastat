@@ -51,7 +51,13 @@ async def transcribe(audio: UploadFile = File(...)):
         with tempfile.NamedTemporaryFile(suffix=suffix, delete=False) as tmp:
             tmp.write(content)
             path = tmp.name
-        result = get_recognizer()(path, generate_kwargs={"task": "transcribe"})
+        # Kiriku is trained in free-transcription mode: do not force Whisper's
+        # language/task tokens, which can bias Wolof speech toward French.
+        result = get_recognizer()(
+            path,
+            chunk_length_s=30,
+            stride_length_s=(4, 2),
+        )
         text = result.get("text", "").strip()
         if len(text) < 2:
             raise HTTPException(status_code=422, detail="Aucune parole reconnue.")
