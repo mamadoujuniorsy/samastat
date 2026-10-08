@@ -40,11 +40,8 @@ export function surveyLabel(s: Pick<Survey, 'title' | 'year_start' | 'year_end'>
 /** Réponse de repli : uniquement des champs de la base, aucune formulation libre. */
 export function fallbackAnswer(records: Indicator[], surveys: Survey[] = []): string {
   const lines = records.map(
-    (r) => `${r.name} — ${r.territory}, ${r.period} : ${formatValue(r)}. Source : ${r.source}.`,
+    (r) => `${r.name} — ${r.territory}, ${r.period} : ${formatValue(r)}.`,
   );
-  if (surveys.length) {
-    lines.push(`Enquêtes ANADS liées : ${surveys.map((s) => `${surveyLabel(s)} — ${s.url}`).join(' ; ')}.`);
-  }
   if (!lines.length) return "Je n'ai pas cette donnée dans le catalogue SamaStat pour l'instant.";
   return lines.join('\n');
 }

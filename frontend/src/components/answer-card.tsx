@@ -152,22 +152,11 @@ export function AnswerCard({ exchange, pending, onAsk, onRetry, autoSpeakLanguag
         </div>
       )}
 
-      {response.data.length > 0 && response.data.length <= 4 && (
-        <section aria-label="Sources des valeurs" className="rounded-lg border border-border bg-surface">
-          <p className="px-4 pt-3 text-[11px] font-medium tracking-wide text-text-faint">Sources</p>
-          <ul className="divide-y divide-border">
-            {response.data.map((d) => (
-              <SourceRow key={d.indicatorId} record={d} />
-            ))}
-          </ul>
-        </section>
-      )}
-
-      {response.data.length > 4 && (
+      {response.data.length > 0 && (
         <details className="rounded-lg border border-border bg-surface group">
-          <summary className="px-4 py-2.5 text-sm text-text-muted hover:text-text flex items-center gap-2 min-h-11">
+          <summary className="cursor-pointer px-4 py-2.5 text-sm text-text-muted hover:text-text flex items-center gap-2 min-h-11">
             <span aria-hidden="true" className="transition-transform group-open:rotate-90">›</span>
-            {response.data.length} sources, une par valeur · {response.data[0].source}
+            Voir les sources ANSD ({response.data.length})
           </summary>
           <ul className="divide-y divide-border border-t border-border">
             {response.data.map((d) => (
@@ -178,9 +167,12 @@ export function AnswerCard({ exchange, pending, onAsk, onRetry, autoSpeakLanguag
       )}
 
       {response.surveys.length > 0 && (
-        <section aria-label="Enquêtes ANADS liées" className="text-sm">
-          <p className="text-xs font-medium text-text-muted">Enquêtes ANADS liées (métadonnées, pas de microdonnées)</p>
-          <ul className="mt-1.5 space-y-1">
+        <details className="rounded-lg border border-border bg-surface group">
+          <summary className="cursor-pointer px-4 py-2.5 text-sm text-text-muted hover:text-text flex items-center gap-2 min-h-11">
+            <span aria-hidden="true" className="transition-transform group-open:rotate-90">›</span>
+            Enquêtes ANSD liées ({response.surveys.length})
+          </summary>
+          <ul className="mt-1.5 space-y-1 border-t border-border px-4 py-3 text-sm">
             {response.surveys.map((s) => (
               <li key={s.idno}>
                 <a href={s.url} target="_blank" rel="noreferrer noopener" className="underline underline-offset-4 decoration-border-strong hover:decoration-text">
@@ -190,7 +182,7 @@ export function AnswerCard({ exchange, pending, onAsk, onRetry, autoSpeakLanguag
               </li>
             ))}
           </ul>
-        </section>
+        </details>
       )}
 
       {response.status !== "conversation" && <Actions response={response} />}

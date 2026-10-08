@@ -142,7 +142,7 @@ export class AssistantService {
       if (fr) {
         state.emit({ kind: 'translate', label: `Traduction : « ${fr} »`, detail: 'NLLB-200 en local ; le modèle vérifie avec la question d’origine' });
         notes.push(`Traduction automatique en français (peut être imparfaite) : « ${fr} »`);
-        notes.push('Réponds en français ; le serveur produira la version wolof.');
+        notes.push('Rédige une réponse canonique très courte ; le serveur produira la version wolof affichée à l’utilisateur.');
         state.frenchQuestion = fr;
       }
     }

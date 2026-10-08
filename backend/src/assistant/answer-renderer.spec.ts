@@ -83,7 +83,7 @@ describe('renderAnswer', () => {
   it('rejette une année d’enquête écrite par le modèle', () => {
     const r = renderAnswer('Voir le recensement de 2023.', [], [rgph5]);
     expect(r.guard).toBe('fallback');
-    expect(r.text).toContain('Enquêtes ANADS liées');
+    expect(r.text).toMatch(/pas cette donnée/);
   });
 
   it('produit un repli sans données quand la liste est vide', () => {
