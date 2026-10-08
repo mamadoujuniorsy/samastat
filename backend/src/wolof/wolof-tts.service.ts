@@ -105,8 +105,6 @@ export class WolofTtsService implements OnModuleInit {
 
   /** Texte wolof → WAV 16 bits mono ; null si le service est inactif ou en échec. */
   async synthesize(text: string): Promise<Buffer | null> {
-    const t = await this.get();
-    if (!t) return null;
     const clean = prepareWolofTtsText(text);
     if (!clean) return null;
     const hit = this.cache.get(clean);
@@ -118,6 +116,8 @@ export class WolofTtsService implements OnModuleInit {
       return remote;
     }
     if (!this.enabled) return null;
+    const t = await this.get();
+    if (!t) return null;
     try {
       const out = await t(clean);
       const audio = Array.isArray(out.audio) ? out.audio[0] : out.audio;
