@@ -10,11 +10,11 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  themeColor: "#0d0d0e",
+  themeColor: "#f6f4ee",
 };
 
 /** Applique le thème choisi avant le premier rendu pour éviter un éclair de thème. */
-const themeScript = `(function(){try{var q=new URLSearchParams(location.search).get('theme');var t=(q==='dark'||q==='light')?q:localStorage.getItem('samastat.theme');if(t==='dark'||t==='light'){document.documentElement.setAttribute('data-theme',t);if(q)localStorage.setItem('samastat.theme',t);}}catch(e){}})();`;
+const themeScript = `(function(){try{var q=new URLSearchParams(location.search).get('theme');var t=(q==='dark'||q==='light')?q:localStorage.getItem('samastat.theme');if(t==='dark'||t==='light'){document.documentElement.setAttribute('data-theme',t);if(q)localStorage.setItem('samastat.theme',t);}var dark=t==='dark'||(t!=='light'&&matchMedia('(prefers-color-scheme: dark)').matches);var m=document.querySelector('meta[name="theme-color"]');if(m)m.content=dark?'#141517':'#f6f4ee';}catch(e){}})();`;
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (

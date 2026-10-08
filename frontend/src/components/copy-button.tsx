@@ -14,7 +14,7 @@ export function CopyButton({ text, label, done }: { text: string; label: string;
     <button
       type="button"
       onClick={async () => setState((await copyText(text)) ? "done" : "failed")}
-      className="min-h-8 underline underline-offset-4 decoration-border-strong hover:decoration-text"
+      className="min-h-11 underline underline-offset-4 decoration-border-strong hover:decoration-text"
     >
       {state === "done" ? done : state === "failed" ? "Copie impossible" : label}
     </button>

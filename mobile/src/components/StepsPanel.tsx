@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native';
-import { spacing, type, useTheme } from '../theme';
+import { spacing, TOUCH, type, useTheme } from '../theme';
 import type { AskStep } from '../types';
 
 const KIND_LABEL: Record<AskStep['kind'], string> = {
@@ -92,5 +92,5 @@ const styles = StyleSheet.create({
   list: { marginTop: spacing.xs, gap: spacing.xs },
   row: { flexDirection: 'row', gap: spacing.sm, alignItems: 'flex-start' },
   kind: { width: 64 },
-  toggle: { minHeight: 32, justifyContent: 'center' },
+  toggle: { minHeight: TOUCH, justifyContent: 'center' },
 });

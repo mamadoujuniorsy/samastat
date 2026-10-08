@@ -14,7 +14,7 @@ export interface Settings {
   voiceLanguage: 'auto' | 'fr' | 'wo';
 }
 
-export const defaultSettings: Settings = { autoRead: false, autoSendAfterDictation: true, voiceLanguage: 'auto' };
+export const defaultSettings: Settings = { autoRead: false, autoSendAfterDictation: false, voiceLanguage: 'auto' };
 
 export async function loadConversations(): Promise<Conversation[]> {
   try {

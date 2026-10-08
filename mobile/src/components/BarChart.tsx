@@ -23,30 +23,32 @@ export function BarChart({ chart }: { chart: ChartHint }) {
         const ratio = max > 0 ? Math.abs(p.value) / max : 0;
         return (
           <View key={p.indicatorId} style={styles.row}>
-            <Text numberOfLines={1} style={[type.caption, styles.label, { color: palette.textMuted }]}>
-              {p.label}
-            </Text>
+            <View style={styles.heading}>
+              <Text style={[type.caption, styles.label, { color: palette.textMuted }]}>{p.label}</Text>
+              <Text style={[type.small, styles.value, { color: palette.text }]}>{p.formattedValue}</Text>
+            </View>
             <View style={[styles.track, { backgroundColor: palette.surfaceMuted }]}>
               <View
                 style={[
                   styles.bar,
-                  { width: `${Math.max(ratio * 100, 2)}%`, backgroundColor: p.value < 0 ? palette.danger : palette.accent },
+                  { width: `${ratio * 100}%`, backgroundColor: p.value < 0 ? palette.danger : palette.accent },
                 ]}
               />
             </View>
-            <Text style={[type.small, styles.value, { color: palette.text }]}>{p.formattedValue}</Text>
           </View>
         );
       })}
+      <Text style={[type.caption, { color: palette.textMuted, marginTop: spacing.sm }]}>Longueur relative à la plus grande valeur absolue ; les valeurs négatives portent le signe − et sont en rouge.</Text>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   card: { borderWidth: 1, borderRadius: radius.md, padding: spacing.md },
-  row: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm, marginTop: spacing.sm },
-  label: { width: 92 },
-  track: { flex: 1, height: 12, borderRadius: radius.sm, overflow: 'hidden' },
+  row: { gap: spacing.xs, marginTop: spacing.sm },
+  heading: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
+  label: { flex: 1 },
+  track: { height: 12, borderRadius: radius.sm, overflow: 'hidden' },
   bar: { height: '100%', borderRadius: radius.sm },
-  value: { minWidth: 90, textAlign: 'right', fontVariant: ['tabular-nums'] },
+  value: { flex: 1, textAlign: 'right', fontVariant: ['tabular-nums'] },
 });

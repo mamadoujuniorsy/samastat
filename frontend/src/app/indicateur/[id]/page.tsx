@@ -98,14 +98,14 @@ function Detail({ detail }: { detail: IndicatorDetail }) {
         </p>
         <div className="pt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs">
           <CopyButton text={detail.citation} label="Copier la citation" done="Citation copiée" />
-          <a className="underline underline-offset-4 decoration-border-strong hover:decoration-text min-h-8 inline-flex items-center" href={`/api/export?ids=${encodeURIComponent(ids)}&format=csv`}>
+          <a className="underline underline-offset-4 decoration-border-strong hover:decoration-text min-h-11 inline-flex items-center" href={`/api/export?ids=${encodeURIComponent(ids)}&format=csv`}>
             CSV des séries
           </a>
-          <a className="underline underline-offset-4 decoration-border-strong hover:decoration-text min-h-8 inline-flex items-center" href={`/api/export?ids=${encodeURIComponent(ids)}&format=json`}>
+          <a className="underline underline-offset-4 decoration-border-strong hover:decoration-text min-h-11 inline-flex items-center" href={`/api/export?ids=${encodeURIComponent(ids)}&format=json`}>
             JSON
           </a>
           <a
-            className="underline underline-offset-4 decoration-border-strong hover:decoration-text min-h-8 inline-flex items-center"
+            className="underline underline-offset-4 decoration-border-strong hover:decoration-text min-h-11 inline-flex items-center"
             href={`/api/export?ids=${encodeURIComponent(ids)}&format=sdmx`}
             title="Format d'échange des instituts nationaux de statistique (SDMX-JSON 2.0, profil simplifié)"
           >

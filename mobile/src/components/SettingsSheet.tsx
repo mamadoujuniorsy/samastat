@@ -34,7 +34,7 @@ export function SettingsSheet({ visible, settings, health, voiceAvailable, onCha
             />
             <Row
               label="Envoyer dès la fin de la dictée"
-              hint={voiceAvailable ? 'Le vocal transcrit (wolof ou français) part tout seul.' : 'Dictée indisponible.'}
+              hint={voiceAvailable ? 'Désactivez pour relire et corriger le texte avant envoi. L’audio est transcrit par Groq ; le wolof reste expérimental.' : 'Dictée indisponible.'}
               value={settings.autoSendAfterDictation}
               onChange={(v) => onChange({ ...settings, autoSendAfterDictation: v })}
             />
@@ -79,7 +79,7 @@ export function SettingsSheet({ visible, settings, health, voiceAvailable, onCha
               label="Catalogue"
               value={health ? `${health.indicators} indicateurs, ${health.surveys} enquêtes ANADS` : 'injoignable'}
             />
-            <Line label="Modèle de langage" value="appel d’outils ; n’écrit jamais un chiffre" />
+            <Line label="Modèle de langage" value="recherche par outils ; valeurs insérées depuis le catalogue" />
           </Group>
 
           <Group title="Données">
@@ -99,8 +99,9 @@ export function SettingsSheet({ visible, settings, health, voiceAvailable, onCha
 
           <Group title="Vie privée">
             <Text style={[type.small, { color: palette.text }]}>
-              Les conversations restent sur cet appareil. Seule la question est transmise à l’API et conservée sans
-              identifiant, pour le tableau de bord d’usage de l’ANSD.
+              L’historique est conservé sur cet appareil. Les questions et le contexte récent sont transmis à l’API.
+              Le texte des questions est enregistré pour les statistiques d’usage ; certaines réponses sont conservées
+              et accessibles par leur lien de partage. Évitez les données personnelles.
             </Text>
           </Group>
         </ScrollView>
@@ -163,5 +164,5 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     justifyContent: 'center',
   },
-  link: { minHeight: 32, justifyContent: 'center' },
+  link: { minHeight: TOUCH, justifyContent: 'center' },
 });

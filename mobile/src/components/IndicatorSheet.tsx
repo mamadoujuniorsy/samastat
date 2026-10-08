@@ -128,7 +128,7 @@ function Line({ label, value, mono }: { label: string; value: string; mono?: boo
 function TextAction({ label, onPress }: { label: string; onPress: () => void }) {
   const { palette } = useTheme();
   return (
-    <Pressable accessibilityRole="button" onPress={onPress} hitSlop={6} style={({ pressed }) => [{ minHeight: 32, justifyContent: 'center' }, pressed && { opacity: 0.6 }]}>
+    <Pressable accessibilityRole="button" onPress={onPress} hitSlop={6} style={({ pressed }) => [{ minHeight: TOUCH, justifyContent: 'center' }, pressed && { opacity: 0.6 }]}>
       <Text style={[type.caption, { color: palette.accent, textDecorationLine: 'underline' }]}>{label}</Text>
     </Pressable>
   );
