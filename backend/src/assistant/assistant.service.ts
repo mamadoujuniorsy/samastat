@@ -22,7 +22,7 @@ import { buildFollowUps } from './follow-ups.js';
 import { AnswersService } from './answers.service.js';
 import { CacheService } from './cache.service.js';
 import { UsageLogService } from './usage-log.service.js';
-import { conciseWolofStatistic, detectLanguage, normalizeWolofForSearch, searchHints, type Language } from './wolof.js';
+import { conciseWolofStatistic, detectLanguage, normalizeWolofForSearch, searchHints, wolofSearchContext, type Language } from './wolof.js';
 import { TranslationService } from '../wolof/translation.service.js';
 
 const MAX_ITERATIONS = 6;
@@ -136,6 +136,8 @@ export class AssistantService {
     const normalizedQuestion = normalizeWolofForSearch(question);
     const hints = searchHints(normalizedQuestion);
     if (hints) notes.push(`Indices de vocabulaire wolof → français fournis par le serveur : ${hints}`);
+    const context = state.language === 'wo' ? wolofSearchContext(normalizedQuestion) : null;
+    if (context) notes.push(context);
     if (state.language === 'wo' && this.translation.available) {
       state.emit({ kind: 'translate', label: 'Traduction automatique de la question wolof vers le français' });
       const fr = await this.translation.toFrench(question);

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { conciseWolofStatistic, detectLanguage, lexiconHits, normalizeWolofForSearch, searchHints } from './wolof.js';
+import { conciseWolofStatistic, detectLanguage, lexiconHits, normalizeWolofForSearch, searchHints, wolofSearchContext } from './wolof.js';
 
 describe('detectLanguage', () => {
   it('reconnaît une question en français', () => {
@@ -59,5 +59,13 @@ describe('lexique', () => {
     expect(normalizeWolofForSearch('Ñaata nit ñoo dëkk Ndakaaru ?')).toContain('Dakar');
     expect(normalizeWolofForSearch('Naata la njëg yi yokku ci Senegaal ?')).toContain('njëg');
     expect(searchHints('Naata la njeg yi yokku ci Senegal ?')).toContain('prix inflation');
+  });
+
+  it('extrait une intention et un territoire pour guider la recherche', () => {
+    expect(wolofSearchContext('Ñaata nit ñoo dëkk Dakar ci 2023 ?'))
+      .toContain('territoire=Dakar');
+    expect(wolofSearchContext('Ñaata nit ñoo dëkk Dakar ci 2023 ?'))
+      .toContain('population');
+    expect(wolofSearchContext('Question inconnue')).toBeNull();
   });
 });

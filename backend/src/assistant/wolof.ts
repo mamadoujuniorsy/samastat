@@ -126,6 +126,21 @@ export function searchHints(question: string): string | null {
   return hits.map((h) => `« ${h.form} » → ${h.french}`).join(' ; ');
 }
 
+/** Contexte structuré transmis au moteur de recherche, sans laisser le LLM
+ * deviner seul l'indicateur ou le territoire à partir d'une phrase Wolof. */
+export function wolofSearchContext(question: string): string | null {
+  const normalized = normalizeWolofForSearch(question);
+  const hits = lexiconHits(normalized);
+  const entities: string[] = [];
+  if (/\b(?:dakar|ndakaaru)\b/i.test(normalized)) entities.push('territoire=Dakar');
+  if (/\b(?:senegal|sénégal|senegaal)\b/i.test(normalized)) entities.push('territoire=Sénégal');
+  const years = normalized.match(/\b(?:19|20)\d{2}\b/g);
+  if (years) entities.push(`période=${[...new Set(years)].join(',')}`);
+  if (!hits.length && !entities.length) return null;
+  const concepts = [...new Set(hits.flatMap((hit) => hit.french.split(/\s+/)))].join(' ');
+  return `Intention extraite par le serveur : indicateur=${concepts || 'à déterminer'}${entities.length ? ` ; ${entities.join(' ; ')}` : ''}. Vérifie ces indices dans le catalogue ANSD.`;
+}
+
 /**
  * Normalise uniquement les variantes fréquentes produites par Whisper.
  * Le texte original reste affiché et envoyé au modèle ; cette version sert
