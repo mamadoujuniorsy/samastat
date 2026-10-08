@@ -39,6 +39,17 @@ GROQ_API_KEY=
 Une seule des deux clés suffit. Avec les deux clés, Anthropic est utilisé en priorité
 et Groq sert de repli automatique pour le LLM et les transcriptions non Wolof.
 
+Pour la meilleure expérience de dictée Wolof pendant la démonstration, Groq Whisper
+est le fournisseur recommandé :
+
+```dotenv
+SAMASTAT_WOLOF_ASR_PROVIDER=groq
+```
+
+Le serveur corrige quelques erreurs phonétiques fréquentes de Whisper (par exemple
+`Deni, nyodeg, dagar.`) avant la recherche. La transcription affichée reste relue
+par l'utilisateur avant l'envoi automatique.
+
 Pour activer la transcription Wolof locale, renseigner si nécessaire le jeton Hugging
 Face demandé par le dépôt Kiriku :
 
@@ -58,8 +69,20 @@ SAMASTAT_AUTH_SECRET=une-chaine-secrete-longue-et-aleatoire
 ```
 
 Les canaux SMS, WhatsApp, la traduction Wolof locale et la synthèse vocale Wolof sont
-optionnels. Le service ASR local est inclus dans le profil `app` et traite les vocaux
-explicitement sélectionnés en Wolof.
+optionnels. Pour obtenir une voix Wolof naturelle, renseigner la clé Soynade :
+
+```dotenv
+SAMASTAT_WOLOF_TTS=0
+SOYNADE_API_KEY=
+SOYNADE_TTS_URL=https://api.soynade.ai/v1/text-to-speech
+SOYNADE_TTS_FALLBACK_LOCAL=0
+```
+
+Avec `SOYNADE_TTS_FALLBACK_LOCAL=0`, une erreur Soynade désactive la lecture plutôt
+que de servir la voix locale expérimentale. Le fallback local ne doit être activé
+(`1`) qu'après validation de sa qualité sur la machine de démonstration.
+Le service ASR local est inclus dans le profil `app` et reste disponible pour les
+installations qui choisissent explicitement `SAMASTAT_WOLOF_ASR_PROVIDER=local`.
 
 ## 4. Construire et démarrer les services
 
@@ -120,6 +143,15 @@ curl http://localhost:8001/health
 La réponse doit indiquer `"status": "ok"`. Le champ `"loaded": false` avant le
 premier vocal est normal : Kiriku est chargé à la demande, puis conservé dans
 le volume `samastat-asr-models`.
+
+Vérifier le fournisseur vocal et de transcription configuré :
+
+```bash
+curl http://localhost:3001/wolof/status
+```
+
+Pour la démonstration recommandée, la réponse doit indiquer
+`transcription.provider = "groq"` et `tts.provider = "soynade"`.
 
 Vérifier l'index sémantique :
 

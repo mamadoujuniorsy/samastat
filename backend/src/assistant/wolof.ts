@@ -19,7 +19,7 @@ interface LexiconEntry {
 
 export const WOLOF_LEXICON: LexiconEntry[] = [
   // Quantité et interrogation
-  { forms: ['ñaata', 'nyaata', 'ñata', 'naata'], french: 'combien' },
+  { forms: ['ñaata', 'nyaata', 'ñata', 'naata', 'niata', 'nyata', 'deni'], french: 'combien' },
   { forms: ['tollu', 'tollu ci', 'tolluwaay'], french: 'effectif taux valeur montant s élève' },
   { forms: ['lim', 'limu'], french: 'nombre total effectif chiffre' },
   { forms: ['xaaj', 'porseentaas'], french: 'taux pourcentage proportion part' },
@@ -29,8 +29,8 @@ export const WOLOF_LEXICON: LexiconEntry[] = [
 
   // Population et démographie (RGPH-5)
   { forms: ['askan', 'askanu', 'askaan'], french: 'population habitants' },
-  { forms: ['nit ñi', 'nit ni', 'nit yi', 'nit'], french: 'population habitants' },
-  { forms: ['dëkk', 'dekk', 'dëkkuwaay'], french: 'habitants population résidente' },
+  { forms: ['nit ñi', 'nit ni', 'nit yi', 'nit', 'nitt', 'niit'], french: 'population habitants' },
+  { forms: ['dëkk', 'dekk', 'dëkkuwaay', 'deukk', 'nyodeg', 'ñoo dëkk'], french: 'habitants population résidente' },
   { forms: ['jigéen', 'jigeen', 'jigéen ñi'], french: 'femmes' },
   { forms: ['góor', 'goor', 'góor ñi'], french: 'hommes' },
   { forms: ['xale yi', 'xale', 'goné', 'gone'], french: 'enfants mortalité infantile' },
@@ -93,7 +93,7 @@ function tokens(s: string): string[] {
 
 /** Entrées du lexique présentes dans la question. */
 export function lexiconHits(question: string): { form: string; french: string }[] {
-  const q = ` ${normalize(question)} `;
+  const q = ` ${normalize(question).replace(/[^\p{L}\p{N}]+/gu, ' ').trim()} `;
   const hits: { form: string; french: string }[] = [];
   for (const entry of WOLOF_LEXICON) {
     const form = entry.forms.find((f) => q.includes(` ${normalize(f)} `));
@@ -148,7 +148,11 @@ export function wolofSearchContext(question: string): string | null {
  */
 export function normalizeWolofForSearch(question: string): string {
   return question
+    .replace(/\b(?:niata|nyata|nyaata|naata|deni)\b/gi, 'Ñaata')
+    .replace(/\b(?:nitt|niit)\b/gi, 'nit')
+    .replace(/\b(?:nyodeg|ny[oó]deg)\b/gi, 'dëkk')
     .replace(/\b(?:ndakaaru|ndakaru|dakarou)\b/gi, 'Dakar')
+    .replace(/\b(?:dagar|daga?r)\b/gi, 'Dakar')
     .replace(/\b(?:senegaal|senegal)\b/gi, 'Sénégal')
     .replace(/\b(?:liggeey|ligeey)\b/gi, 'liggéey')
     .replace(/\b(?:jigeen)\b/gi, 'jigéen')

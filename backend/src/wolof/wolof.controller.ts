@@ -46,6 +46,7 @@ export class WolofController {
         model: this.tts.provider === 'soynade' ? SOYNADE_TTS_MODEL : WOLOF_TTS_MODEL,
         licence: this.tts.provider === 'soynade' ? 'Soynade terms' : 'CC BY-NC 4.0',
         experimental: this.tts.provider !== 'soynade',
+        fallbackLocal: this.tts.fallbackLocal,
       },
     };
   }

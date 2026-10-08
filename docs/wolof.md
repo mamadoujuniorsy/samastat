@@ -67,9 +67,11 @@ avec validation par un locuteur wolof.
 Reconnaissance vocale web : le navigateur enregistre un court clip puis le backend le transmet à Groq
 Whisper (`whisper-large-v3-turbo`) pour transcription. L'audio quitte donc le navigateur et est envoyé à
 un fournisseur tiers ; l'interface l'indique avant l'enregistrement. Le français est demandé avec le code
-`fr`. Pour le wolof, la détection est laissée au modèle et un prompt donne le contexte sénégalais, mais la
-qualité n'a pas été évaluée sur des locuteurs/accent locaux : l'interface doit présenter ce chemin comme
-expérimental et demander de relire la transcription. Ne pas promettre une dictée wolof fiable.
+`fr`. Pour le wolof, un prompt donne le contexte sénégalais et le serveur corrige quelques sorties
+phonétiques connues avant la recherche (par exemple `Deni, nyodeg, dagar.` devient
+`Ñaata nit ñoo dëkk Dakar ?`). La phrase corrigée reste visible afin que l'utilisateur puisse la relire.
+Cette correction n'est pas un correcteur généraliste : les questions inconnues doivent toujours être relues
+avant l'envoi.
 
 Groq indique que les données de ses points de terminaison audio peuvent être conservées jusqu'à 30 jours
 pour la fiabilité et la surveillance des abus, sauf configuration Zero Data Retention.
@@ -90,14 +92,19 @@ gated ; il doit être fourni uniquement dans l'environnement du serveur, jamais 
 
 La stratégie est :
 
-1. le choix vocal Wolof (`language=wo`) est envoyé au moteur Kiriku local ;
-2. les variantes fréquentes de transcription (`Ndakaaru`, `njeg`, `liggeey`, etc.) sont
+1. Groq Whisper est le chemin recommandé pour la dictée Wolof (`SAMASTAT_WOLOF_ASR_PROVIDER=groq`) ;
+2. le choix vocal Wolof peut être envoyé au moteur Kiriku local uniquement avec
+   `SAMASTAT_WOLOF_ASR_PROVIDER=local` ;
+3. les variantes fréquentes de transcription (`Ndakaaru`, `njeg`, `liggeey`, etc.) sont
    normalisées uniquement pour la recherche ;
-3. la question originale reste conservée pour l'affichage et la traçabilité ;
-4. le catalogue ANSD reste la seule source des valeurs ;
-5. pour les questions françaises ou le mode automatique, le chemin Groq reste disponible
-   si une clé est configurée ; l'interface Wolof doit sélectionner explicitement Wolof
-   pour bénéficier de Kiriku.
+4. la question corrigée est affichée pour validation et le catalogue ANSD reste la seule source des valeurs ;
+5. pour les questions françaises ou le mode automatique, le chemin Groq reste disponible si une clé est configurée.
+
+Si `SOYNADE_API_KEY` est configurée, Soynade est prioritaire pour la synthèse vocale.
+En cas d'échec, le serveur ne bascule pas automatiquement vers le modèle local expérimental
+(`SOYNADE_TTS_FALLBACK_LOCAL=0` par défaut) : il vaut mieux afficher un bouton indisponible
+que faire écouter une prononciation Wolof de mauvaise qualité. Le fallback local peut être
+réactivé explicitement après test (`SOYNADE_TTS_FALLBACK_LOCAL=1`).
 
 Le modèle `AIHubSN/M-Kiriku-ASR` reste une option pour une future version multilingue.
 

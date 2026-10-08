@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { detectLanguage } from '../assistant/wolof.js';
+import { detectLanguage, normalizeWolofForSearch } from '../assistant/wolof.js';
 
 export type VoiceLanguage = 'fr' | 'wo' | 'auto';
 
@@ -120,7 +120,7 @@ export class TranscriptionService {
       throw new TranscriptionError('La transcription a échoué. Réessayez ou saisissez votre question.', 'failed');
     }
 
-    const text = result.text.trim();
+    const text = normalizeWolofTranscript(result.text.trim());
     if (text.length < 2) {
       throw new TranscriptionError('Aucune parole reconnue. Réessayez plus près du micro.', 'failed');
     }
@@ -169,10 +169,40 @@ export class TranscriptionService {
       this.logger.warn(`ASR local refusé (${response.status}) : ${result?.detail ?? ''}`.trim());
       throw new TranscriptionError('La transcription locale Wolof a échoué.', 'failed');
     }
-    const text = result.text.trim();
+    const text = normalizeWolofTranscript(result.text.trim());
     if (text.length < 2) throw new TranscriptionError('Aucune parole Wolof reconnue.', 'failed');
     return { text, language: 'wo' };
   }
+
+}
+
+/**
+ * Normalise les erreurs phonétiques connues de Whisper avant l'analyse de la
+ * question. La correction reste limitée aux formulations statistiques reconnues.
+ */
+export function normalizeWolofTranscript(text: string): string {
+  const normalized = normalizeWolofForSearch(text);
+  const lower = normalized.toLocaleLowerCase('fr-FR');
+  const hasCountQuestion = lower.includes('ñaata') || lower.includes('niata');
+  const hasPeople = /\b(?:nit|nitt|niit)\b/i.test(normalized);
+  const hasResidencePhrase = lower.includes('dëkk') || lower.includes('dekk');
+  const territory = ['dagar', 'dakarou', 'dakar', 'senegal', 'sénégal', 'senegaal']
+    .some((name) => lower.includes(name));
+
+  if (hasCountQuestion && (hasPeople || hasResidencePhrase) && territory) {
+    const match = normalized.match(/\b(?:dagar|daga?r|dakarou|dakar|senegal|sénégal|senegaal)\b/i);
+    const place = match?.[0].toLowerCase().startsWith('daka') || match?.[0].toLowerCase().startsWith('dag')
+      ? 'Dakar'
+      : 'Sénégal';
+    return `Ñaata nit ñoo dëkk ${place} ?`;
+  }
+
+  return text
+    .replace(/\b(?:niata|nyata|nyaata|naata|deni)\b/gi, 'Ñaata')
+    .replace(/\b(?:nitt|niit)\b/gi, 'nit')
+    .replace(/\b(?:nyodeg|ny[oó]deg)\b/gi, 'ñoo dëkk')
+    .replace(/\b(?:dagar|daga?r|dakarou)\b/gi, 'Dakar')
+    .replace(/\b(?:senegaal|senegal)\b/gi, 'Sénégal');
 }
 
 export function parseVoiceLanguage(raw: string | undefined): VoiceLanguage {

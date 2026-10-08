@@ -30,6 +30,7 @@ export class WolofTtsService implements OnModuleInit {
   private readonly enabled: boolean;
   private readonly soynadeKey: string | undefined;
   private readonly soynadeUrl: string;
+  private readonly allowLocalFallback: boolean;
   private tts: Promise<TextToAudioPipeline | null> | null = null;
   private readonly cache = new Map<string, Buffer>();
 
@@ -37,6 +38,7 @@ export class WolofTtsService implements OnModuleInit {
     this.enabled = config.get<string>('SAMASTAT_WOLOF_TTS') === '1';
     this.soynadeKey = config.get<string>('SOYNADE_API_KEY')?.trim() || undefined;
     this.soynadeUrl = config.get<string>('SOYNADE_TTS_URL')?.trim() || 'https://api.soynade.ai/v1/text-to-speech';
+    this.allowLocalFallback = config.get<string>('SOYNADE_TTS_FALLBACK_LOCAL') === '1';
   }
 
   onModuleInit(): void {
@@ -52,6 +54,10 @@ export class WolofTtsService implements OnModuleInit {
     if (this.soynadeKey) return 'soynade';
     if (this.enabled) return 'local';
     return 'none';
+  }
+
+  get fallbackLocal(): boolean {
+    return this.allowLocalFallback;
   }
 
   private async synthesizeSoynade(text: string): Promise<Buffer | null> {
@@ -115,7 +121,9 @@ export class WolofTtsService implements OnModuleInit {
       this.cache.set(clean, remote);
       return remote;
     }
-    if (!this.enabled) return null;
+    // Do not silently return the experimental voice when a configured remote
+    // provider fails; that produces a misleadingly poor audio response.
+    if (!this.enabled || (this.soynadeKey && !this.allowLocalFallback)) return null;
     const t = await this.get();
     if (!t) return null;
     try {

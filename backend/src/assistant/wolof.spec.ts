@@ -59,6 +59,7 @@ describe('lexique', () => {
     expect(normalizeWolofForSearch('Ñaata nit ñoo dëkk Ndakaaru ?')).toContain('Dakar');
     expect(normalizeWolofForSearch('Naata la njëg yi yokku ci Senegaal ?')).toContain('njëg');
     expect(searchHints('Naata la njeg yi yokku ci Senegal ?')).toContain('prix inflation');
+    expect(wolofSearchContext('Deni, nyodeg, dagar.')).toContain('population');
   });
 
   it('extrait une intention et un territoire pour guider la recherche', () => {
