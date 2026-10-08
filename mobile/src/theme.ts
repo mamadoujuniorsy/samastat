@@ -1,7 +1,7 @@
 import { useColorScheme, type TextStyle } from 'react-native';
 
 /**
- * Mêmes tokens que le frontend web (docs/DESIGN.md) : un accent bleu,
+ * Mêmes tokens que le frontend web (docs/ui-ux-principes.md) : un accent vert profond,
  * neutres légèrement chauds, contraste ≥ 4.5:1, mode sombre suivant le système.
  */
 export interface Palette {
@@ -29,9 +29,9 @@ export const light: Palette = {
   borderStrong: '#b8b2a3',
   text: '#1c1b18',
   textMuted: '#5c594f',
-  accent: '#175c91',
-  accentStrong: '#10466f',
-  accentSoft: '#e6f0f8',
+  accent: '#0f6b3f',
+  accentStrong: '#0b5231',
+  accentSoft: '#e3f1e9',
   onAccent: '#ffffff',
   danger: '#9b1c1c',
   dangerSoft: '#fbe9e9',
@@ -46,9 +46,9 @@ export const dark: Palette = {
   borderStrong: '#545a66',
   text: '#ecebe6',
   textMuted: '#a9a89f',
-  accent: '#83b8e3',
-  accentStrong: '#a3cdee',
-  accentSoft: '#1d3344',
+  accent: '#5fc48f',
+  accentStrong: '#8ad9ae',
+  accentSoft: '#1d3328',
   onAccent: '#15161a',
   danger: '#f08a8a',
   dangerSoft: '#3a1f1f',

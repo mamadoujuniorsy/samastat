@@ -1,6 +1,6 @@
 import { Feather } from '@expo/vector-icons';
 import { Linking, Pressable, StyleSheet, Text, View } from 'react-native';
-import { radius, spacing, TOUCH, type, useTheme } from '../theme';
+import { radius, spacing, type, useTheme } from '../theme';
 import type { CitedRecord } from '../types';
 
 const dateFormat = new Intl.DateTimeFormat('fr-FR', { dateStyle: 'medium' });
@@ -54,6 +54,6 @@ const styles = StyleSheet.create({
   head: { flexDirection: 'row', alignItems: 'flex-start', gap: spacing.md },
   headText: { flex: 1, gap: 2 },
   links: { flexDirection: 'row', flexWrap: 'wrap', columnGap: spacing.lg, marginTop: spacing.xs },
-  link: { flexDirection: 'row', alignItems: 'center', gap: spacing.xs, minHeight: TOUCH },
+  link: { flexDirection: 'row', alignItems: 'center', gap: spacing.xs, minHeight: 28 },
   mono: { fontFamily: 'monospace', marginTop: spacing.xs },
 });

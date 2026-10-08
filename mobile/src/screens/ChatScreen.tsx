@@ -26,7 +26,6 @@ export function ChatScreen() {
   const conv = useConversations();
   const speaker = useSpeaker();
   const [draft, setDraft] = useState('');
-  const [draftVoiceLanguage, setDraftVoiceLanguage] = useState<'fr' | 'wo' | null>(null);
   const [historyOpen, setHistoryOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [indicatorId, setIndicatorId] = useState<string | null>(null);
@@ -63,7 +62,6 @@ export function ChatScreen() {
     (text: string, language?: 'fr' | 'wo') => {
       speaker.stop();
       setDraft('');
-      setDraftVoiceLanguage(null);
       void conv.send(text, language);
     },
     [conv, speaker],
@@ -73,10 +71,7 @@ export function ChatScreen() {
     language: settings.voiceLanguage,
     onFinal: (text, language) => {
       if (settings.autoSendAfterDictation) send(text, language);
-      else {
-        setDraft(text.slice(0, 500));
-        setDraftVoiceLanguage(language);
-      }
+      else setDraft(text);
     },
   });
 
@@ -108,7 +103,6 @@ export function ChatScreen() {
         onNewConversation={() => {
           speaker.stop();
           setDraft('');
-          setDraftVoiceLanguage(null);
           conv.newConversation();
         }}
       />
@@ -139,9 +133,7 @@ export function ChatScreen() {
         )}
 
         <View style={[styles.composer, { borderTopColor: palette.border, backgroundColor: palette.bg }]}>
-          <Composer value={draft} onChange={(text) => { setDraft(text); if (!text.trim()) setDraftVoiceLanguage(null); }}
-            onSend={(text) => send(text, draftVoiceLanguage ?? undefined)} onStop={conv.stop} pending={conv.pending} voice={voice}
-            autoSendAfterDictation={settings.autoSendAfterDictation} />
+          <Composer value={draft} onChange={setDraft} onSend={send} onStop={conv.stop} pending={conv.pending} voice={voice} />
         </View>
       </KeyboardAvoidingView>
 
@@ -170,7 +162,7 @@ export function ChatScreen() {
         onClose={() => setSettingsOpen(false)}
       />
 
-      <IndicatorSheet indicatorId={indicatorId} onClose={() => setIndicatorId(null)} onAsk={(q) => { setDraft(q); setDraftVoiceLanguage(null); }} />
+      <IndicatorSheet indicatorId={indicatorId} onClose={() => setIndicatorId(null)} onAsk={(q) => setDraft(q)} />
     </SafeAreaView>
   );
 }

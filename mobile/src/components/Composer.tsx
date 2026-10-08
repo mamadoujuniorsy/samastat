@@ -12,7 +12,6 @@ interface Props {
   onStop: () => void;
   pending: boolean;
   voice: VoiceInput;
-  autoSendAfterDictation: boolean;
 }
 
 const MAX_LENGTH = 500;
@@ -21,7 +20,7 @@ const MAX_LENGTH = 500;
  * Zone de saisie : texte ou dictée. Pendant la dictée, le texte reconnu remplit le champ en direct.
  * Pendant le traitement, le bouton Envoyer devient Arrêter.
  */
-export function Composer({ value, onChange, onSend, onStop, pending, voice, autoSendAfterDictation }: Props) {
+export function Composer({ value, onChange, onSend, onStop, pending, voice }: Props) {
   const { palette } = useTheme();
   const inputRef = useRef<TextInput>(null);
   const [focused, setFocused] = useState(false);
@@ -129,7 +128,7 @@ export function Composer({ value, onChange, onSend, onStop, pending, voice, auto
       </View>
       {voice.listening && (
         <Text style={[type.caption, styles.hint, { color: palette.textMuted }]} accessibilityLiveRegion="polite">
-          Parlez en wolof ou en français, puis appuyez sur le carré. {autoSendAfterDictation ? 'Le texte sera envoyé automatiquement.' : 'Relisez le texte avant de l’envoyer.'}
+          Parlez en wolof ou en français, puis appuyez sur le carré. La question part automatiquement.
         </Text>
       )}
       {voice.transcribing && (
@@ -154,7 +153,7 @@ const styles = StyleSheet.create({
   },
   input: { flex: 1, minHeight: TOUCH, maxHeight: 140, paddingVertical: spacing.sm, paddingRight: spacing.sm },
   actions: { flexDirection: 'row', alignItems: 'center', gap: spacing.xs, paddingBottom: 2 },
-  round: { width: TOUCH, height: TOUCH, borderRadius: radius.pill, alignItems: 'center', justifyContent: 'center' },
+  round: { width: 40, height: 40, borderRadius: radius.pill, alignItems: 'center', justifyContent: 'center' },
   error: { marginBottom: spacing.sm, marginHorizontal: spacing.xs },
   hint: { marginTop: spacing.sm, marginHorizontal: spacing.xs },
 });

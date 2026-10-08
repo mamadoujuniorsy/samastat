@@ -2,7 +2,7 @@ import { Feather } from '@expo/vector-icons';
 import { useAudioPlayer, useAudioPlayerStatus } from 'expo-audio';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { wolofTtsUrl } from '../api';
-import { spacing, TOUCH, type, useTheme } from '../theme';
+import { spacing, type, useTheme } from '../theme';
 
 /**
  * Version wolof d'une réponse (traduction locale, valeurs protégées) avec lecture par la voix
@@ -53,5 +53,5 @@ export function WolofAnswer({ wolof, french }: { wolof: string; french: string }
 
 const styles = StyleSheet.create({
   wrap: { gap: spacing.sm },
-  listen: { flexDirection: 'row', alignItems: 'center', gap: spacing.xs, minHeight: TOUCH, alignSelf: 'flex-start' },
+  listen: { flexDirection: 'row', alignItems: 'center', gap: spacing.xs, minHeight: 32, alignSelf: 'flex-start' },
 });

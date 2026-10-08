@@ -259,7 +259,7 @@ function Chip({ label, onPress, disabled }: { label: string; onPress: () => void
 function TextAction({ label, onPress }: { label: string; onPress: () => void }) {
   const { palette } = useTheme();
   return (
-    <Pressable accessibilityRole="button" onPress={onPress} hitSlop={6} style={({ pressed }) => [{ minHeight: TOUCH, justifyContent: 'center' }, pressed && { opacity: 0.6 }]}>
+    <Pressable accessibilityRole="button" onPress={onPress} hitSlop={6} style={({ pressed }) => [{ minHeight: 32, justifyContent: 'center' }, pressed && { opacity: 0.6 }]}>
       <Text style={[type.small, { color: palette.accent, textDecorationLine: 'underline' }]}>{label}</Text>
     </Pressable>
   );
@@ -296,7 +296,7 @@ const styles = StyleSheet.create({
   alert: { borderRadius: radius.md, padding: spacing.md },
   noData: { borderRadius: radius.md, padding: spacing.md, gap: spacing.xs },
   chips: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
-  chip: { borderWidth: 1, borderRadius: radius.pill, paddingHorizontal: spacing.md, paddingVertical: spacing.sm, minHeight: TOUCH, justifyContent: 'center' },
+  chip: { borderWidth: 1, borderRadius: radius.pill, paddingHorizontal: spacing.md, paddingVertical: spacing.sm, minHeight: 36, justifyContent: 'center' },
   sources: { gap: spacing.sm },
   actions: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.lg },
   action: { flexDirection: 'row', alignItems: 'center', gap: spacing.xs, minHeight: TOUCH - 12 },
