@@ -98,7 +98,7 @@ export function RegionMap({ title, values, unit }: { title: string; values: Regi
           valeur dans cette réponse (en gris).
         </p>
       )}
-      <p className="mt-1 text-[11px] text-text-muted">Contours : geoBoundaries (CC BY 4.0), simplifiés.</p>
+      <p className="mt-1 text-xs text-text-muted">Contours : geoBoundaries (CC BY 4.0), simplifiés.</p>
     </figure>
   );
 }

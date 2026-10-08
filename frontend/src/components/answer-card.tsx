@@ -5,6 +5,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import type { CitedRecord, Exchange } from "@/lib/types";
 import { citationFor, copyText, shareOrCopy, shareText, speak } from "@/lib/actions";
 import { BarChart } from "./bar-chart";
+import { StepsPanel } from "./steps-panel";
 import { RegionMap } from "./region-map";
 import { IconArrowRight } from "./icons";
 
@@ -25,7 +26,7 @@ export function AnswerCard({ exchange, pending, onAsk, onRetry, autoSpeakLanguag
     return (
       <div className="text-sm text-text-muted">
         <p>Question interrompue avant la réponse.</p>
-        <button type="button" onClick={onRetry} className="mt-1 underline underline-offset-4 hover:text-text min-h-9">
+        <button type="button" onClick={onRetry} className="mt-1 underline underline-offset-4 hover:text-text min-h-11">
           Relancer
         </button>
       </div>
@@ -38,7 +39,7 @@ export function AnswerCard({ exchange, pending, onAsk, onRetry, autoSpeakLanguag
         <p className="font-medium text-danger">La réponse n&apos;a pas pu être obtenue</p>
         <p>{transportError}</p>
         <p>
-          <button type="button" onClick={onRetry} className="underline underline-offset-4 min-h-9">
+          <button type="button" onClick={onRetry} className="underline underline-offset-4 min-h-11">
             Réessayer
           </button>
         </p>
@@ -47,16 +48,7 @@ export function AnswerCard({ exchange, pending, onAsk, onRetry, autoSpeakLanguag
   }
 
   if (!response) {
-    return (
-      <div className="flex min-h-10 items-center gap-2.5 text-sm text-text-muted" role="status" aria-live="polite" aria-busy={pending}>
-        <span className="flex items-center gap-1" aria-hidden="true">
-          <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-text-muted [animation-delay:-0.24s]" />
-          <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-text-muted [animation-delay:-0.12s]" />
-          <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-text-muted" />
-        </span>
-        <span>{pending ? "SamaStat prépare une réponse…" : "Connexion au service…"}</span>
-      </div>
-    );
+    return <StepsPanel steps={exchange.steps} live={pending} />;
   }
 
   if (response.status === "error") {
@@ -65,7 +57,7 @@ export function AnswerCard({ exchange, pending, onAsk, onRetry, autoSpeakLanguag
         <p className="font-medium text-danger">Le service n&apos;a pas pu répondre</p>
         <p>{response.answer}</p>
         <p>
-          <button type="button" onClick={onRetry} className="underline underline-offset-4 min-h-9">
+          <button type="button" onClick={onRetry} className="underline underline-offset-4 min-h-11">
             Réessayer
           </button>
         </p>
@@ -77,6 +69,7 @@ export function AnswerCard({ exchange, pending, onAsk, onRetry, autoSpeakLanguag
 
   return (
     <article className="space-y-5" aria-label="Réponse de SamaStat">
+      <StepsPanel steps={exchange.steps} live={false} />
       {single && <Headline record={single} />}
 
       {response.answerWolof ? (
@@ -87,7 +80,7 @@ export function AnswerCard({ exchange, pending, onAsk, onRetry, autoSpeakLanguag
                 {response.answerWolof}
               </p>
               <div className="rounded-xl border border-border/60 bg-surface-muted/40 p-3 space-y-1">
-                <span className="text-[11px] font-semibold text-text-muted uppercase tracking-wider">Version française</span>
+                <span className="text-xs font-semibold text-text-muted uppercase tracking-wider">Version française</span>
                 <p className="text-sm leading-relaxed whitespace-pre-wrap text-text-muted" lang="fr">
                   {response.answer}
                 </p>
@@ -99,7 +92,7 @@ export function AnswerCard({ exchange, pending, onAsk, onRetry, autoSpeakLanguag
                 {response.answer}
               </p>
               <div className="rounded-xl border border-border/60 bg-surface-muted/40 p-3 space-y-1">
-                <span className="text-[11px] font-semibold text-accent uppercase tracking-wider">Traduction wolof (ANSD)</span>
+                <span className="text-xs font-semibold text-accent uppercase tracking-wider">Traduction automatique en wolof</span>
                 <p className="text-sm font-medium leading-relaxed whitespace-pre-wrap text-text" lang="wo">
                   {response.answerWolof}
                 </p>
@@ -154,7 +147,7 @@ export function AnswerCard({ exchange, pending, onAsk, onRetry, autoSpeakLanguag
 
       {response.data.length > 0 && response.data.length <= 4 && (
         <section aria-label="Sources des valeurs" className="rounded-lg border border-border bg-surface">
-          <p className="px-4 pt-3 text-[11px] font-medium tracking-wide text-text-faint">Sources</p>
+          <p className="px-4 pt-3 text-xs font-medium tracking-wide text-text-faint">Sources</p>
           <ul className="divide-y divide-border">
             {response.data.map((d) => (
               <SourceRow key={d.indicatorId} record={d} />
@@ -260,10 +253,10 @@ function SourceRow({ record }: { record: CitedRecord }) {
             Fiche et séries
           </Link>
           <span className="text-text-muted"> · </span>
-          <code className="font-mono text-[11px] text-text-muted">{record.indicatorId}</code>
+          <code className="font-mono text-xs text-text-muted">{record.indicatorId}</code>
         </p>
       </div>
-      <p className="tabular text-base font-medium sm:text-right whitespace-nowrap">{record.formattedValue}</p>
+      <p className="tabular min-w-0 break-words text-base font-medium sm:text-right">{record.formattedValue}</p>
     </li>
   );
 }
@@ -285,7 +278,7 @@ function Chip({
       onClick={onClick}
       disabled={disabled}
       title={title}
-      className="min-h-9 inline-flex items-center gap-1.5 rounded-full border border-border bg-surface px-3.5 py-1.5 text-sm hover:border-border-strong hover:bg-bg-elevated disabled:opacity-50 disabled:cursor-not-allowed"
+      className="min-h-11 inline-flex items-center gap-1.5 rounded-full border border-border bg-surface px-3.5 py-1.5 text-sm hover:border-border-strong hover:bg-bg-elevated disabled:opacity-50 disabled:cursor-not-allowed"
     >
       {children}
       <IconArrowRight size={13} />
@@ -325,14 +318,14 @@ function Actions({ response }: { response: Exchange["response"] & object }) {
       />
       {response.data.length > 0 && (
         <>
-          <a className="underline underline-offset-4 decoration-border-strong hover:decoration-text min-h-8 inline-flex items-center" href={`/api/export?ids=${encodeURIComponent(ids)}&format=csv`}>
+          <a className="underline underline-offset-4 decoration-border-strong hover:decoration-text min-h-11 inline-flex items-center" href={`/api/export?ids=${encodeURIComponent(ids)}&format=csv`}>
             CSV
           </a>
-          <a className="underline underline-offset-4 decoration-border-strong hover:decoration-text min-h-8 inline-flex items-center" href={`/api/export?ids=${encodeURIComponent(ids)}&format=json`}>
+          <a className="underline underline-offset-4 decoration-border-strong hover:decoration-text min-h-11 inline-flex items-center" href={`/api/export?ids=${encodeURIComponent(ids)}&format=json`}>
             JSON
           </a>
           <a
-            className="underline underline-offset-4 decoration-border-strong hover:decoration-text min-h-8 inline-flex items-center"
+            className="underline underline-offset-4 decoration-border-strong hover:decoration-text min-h-11 inline-flex items-center"
             href={`/api/export?ids=${encodeURIComponent(ids)}&format=sdmx`}
             title="Format d'échange des instituts nationaux de statistique (SDMX-JSON 2.0, profil simplifié)"
           >
@@ -489,7 +482,7 @@ function ActionButton({ label, onClick, active }: { label: string; onClick: () =
       type="button"
       onClick={onClick}
       aria-pressed={active}
-      className={`min-h-8 underline underline-offset-4 decoration-border-strong hover:decoration-text ${active ? "text-accent" : ""}`}
+      className={`min-h-11 underline underline-offset-4 decoration-border-strong hover:decoration-text ${active ? "text-accent" : ""}`}
     >
       {label}
     </button>

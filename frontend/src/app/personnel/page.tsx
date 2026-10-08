@@ -14,7 +14,7 @@ export default async function PersonnelPage() {
   return (
     <AppShell current="/personnel">
       <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-8 sm:px-6 sm:py-12">
-        <p className="rule text-[11px] font-medium tracking-wide text-text-muted">Espace ANSD</p>
+        <p className="rule text-xs font-medium tracking-wide text-text-muted">Espace ANSD</p>
         <h1 className="display mt-2 text-3xl sm:text-4xl">Gestion du personnel</h1>
         <p className="mt-3 max-w-2xl text-sm leading-relaxed text-text-muted">
           Créez les accès aux outils internes. Les mots de passe sont hachés avant stockage et les routes de gestion sont réservées aux administrateurs.

@@ -13,7 +13,7 @@ export default async function ConnexionPage() {
   return (
     <AppShell current="/connexion">
       <main className="mx-auto w-full max-w-md px-4 sm:px-6 py-12 flex-1">
-        <p className="rule text-[11px] font-medium tracking-wide text-text-faint">Espace ANSD</p>
+        <p className="rule text-xs font-medium tracking-wide text-text-faint">Espace ANSD</p>
         <h1 className="display mt-2 text-[2rem]">Connexion du personnel</h1>
         <p className="mt-3 text-sm leading-relaxed text-text-muted">
           Réservé aux agents de l&apos;Agence Nationale de la Statistique et de la Démographie : tableau de bord des questions

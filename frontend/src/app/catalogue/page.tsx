@@ -69,7 +69,7 @@ export default async function CataloguePage({ searchParams }: PageProps<"/catalo
             placeholder="Filtrer : pauvreté, Kaolack, inflation…"
             className="flex-1 min-w-0 min-h-11 rounded-md border border-border-strong bg-surface px-3 text-base placeholder:text-text-muted"
           />
-          <button type="submit" className="min-h-11 rounded-md bg-accent px-4 text-sm font-medium text-white hover:bg-accent-strong dark:text-bg">
+          <button type="submit" className="min-h-11 rounded-md bg-accent px-4 text-sm font-medium text-on-accent hover:bg-accent-strong">
             Filtrer
           </button>
         </form>
@@ -170,7 +170,7 @@ function FilterChip({ href, active, children }: { href: string; active: boolean;
     <Link
       href={href}
       aria-current={active ? "true" : undefined}
-      className={`min-h-9 inline-flex items-center gap-1 rounded-full border px-3 py-1 ${
+      className={`min-h-11 inline-flex items-center gap-1 rounded-full border px-3 py-1 ${
         active ? "border-accent bg-accent-soft text-text" : "border-border-strong bg-surface hover:bg-surface-muted"
       }`}
     >

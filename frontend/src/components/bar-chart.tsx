@@ -14,21 +14,22 @@ export function BarChart({ chart, compact = false }: { chart: ChartHint; compact
         {chart.points.map((p) => {
           const ratio = max > 0 ? Math.abs(p.value) / max : 0;
           return (
-            <li key={p.indicatorId} className="grid grid-cols-[7rem_1fr_auto] items-center gap-3 text-sm">
-              <span className="truncate text-xs text-text-muted" title={p.label}>
+            <li key={p.indicatorId} className="grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)] items-center gap-x-3 gap-y-1.5 text-sm sm:grid-cols-[7rem_minmax(0,1fr)_minmax(0,auto)]">
+              <span className="min-w-0 break-words text-xs text-text-muted" title={p.label}>
                 {p.label.replace(/^Région de /, "")}
               </span>
-              <span className="h-3 rounded-sm bg-surface-muted overflow-hidden" aria-hidden="true">
+              <span className="col-span-2 row-start-2 h-3 rounded-sm bg-surface-muted overflow-hidden sm:col-span-1 sm:row-start-1 sm:col-start-2" aria-hidden="true">
                 <span
                   className={`block h-full rounded-sm ${p.value < 0 ? "bg-danger" : "bg-accent"}`}
-                  style={{ width: `${Math.max(ratio * 100, 1.5)}%` }}
+                  style={{ width: `${ratio * 100}%` }}
                 />
               </span>
-              <span className="tabular whitespace-nowrap font-medium">{p.formattedValue}</span>
+              <span className="tabular min-w-0 break-words text-right font-medium sm:col-start-3">{p.formattedValue}</span>
             </li>
           );
         })}
       </ul>
+      <p className="mt-2 text-xs text-text-muted">Longueur relative à la plus grande valeur absolue ; les valeurs négatives sont signalées par leur signe et en rouge.</p>
     </figure>
   );
 }
