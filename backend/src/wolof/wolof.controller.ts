@@ -5,7 +5,7 @@ import { Throttle } from '@nestjs/throttler';
 import type { Response } from 'express';
 import { TRANSLATION_MODEL, TranslationService } from './translation.service.js';
 import { TranscriptionError, TranscriptionService } from './transcription.service.js';
-import { WOLOF_TTS_MODEL, WolofTtsService } from './wolof-tts.service.js';
+import { SOYNADE_TTS_MODEL, WOLOF_TTS_MODEL, WolofTtsService } from './wolof-tts.service.js';
 
 @ApiTags('Wolof')
 @Controller('wolof')
@@ -40,7 +40,13 @@ export class WolofController {
         model: this.transcription.localAvailable ? 'AIHubSN/kiriku-ASR' : 'whisper-large-v3-turbo',
       },
       translation: { enabled: this.translation.available, model: TRANSLATION_MODEL, licence: 'CC BY-NC 4.0' },
-      tts: { enabled: this.tts.available, model: WOLOF_TTS_MODEL, licence: 'CC BY-NC 4.0', experimental: true },
+      tts: {
+        enabled: this.tts.available,
+        provider: this.tts.provider,
+        model: this.tts.provider === 'soynade' ? SOYNADE_TTS_MODEL : WOLOF_TTS_MODEL,
+        licence: this.tts.provider === 'soynade' ? 'Soynade terms' : 'CC BY-NC 4.0',
+        experimental: this.tts.provider !== 'soynade',
+      },
     };
   }
 
