@@ -43,47 +43,59 @@ export class OpenAiCompatibleProvider implements LlmProvider {
       tool_choice: 'auto',
     };
 
-    let res: Response;
-    try {
-      res = await fetch(`${this.baseUrl.replace(/\/$/, '')}/chat/completions`, {
-        method: 'POST',
-        headers: { 'content-type': 'application/json', authorization: `Bearer ${this.apiKey}` },
-        body: JSON.stringify(body),
-        signal: AbortSignal.timeout(120_000),
-      });
-    } catch (err) {
-      throw new ProviderUnavailableError(this.name, `injoignable (${(err as Error).message})`, err);
-    }
-    const data = (await res.json().catch(() => null)) as OpenAiResponse | null;
-    if (!res.ok || !data?.choices?.length) {
-      const detail = data?.error?.message ?? `HTTP ${res.status}`;
-      const short =
-        res.status === 401 || res.status === 403
-          ? 'clé API refusée'
-          : res.status === 429
-            ? 'quota ou limite de débit atteint'
-            : res.status >= 500
-              ? `erreur serveur (${res.status})`
-              : !data?.choices?.length
-                ? detail.length <= 220 ? detail : 'réponse vide'
-                : null;
-      if (short) throw new ProviderUnavailableError(this.name, short, detail);
-      throw new Error(`${this.name} : ${detail}`);
+    const maxRetries = 2;
+    for (let attempt = 0; attempt <= maxRetries; attempt++) {
+      let res: Response;
+      try {
+        res = await fetch(`${this.baseUrl.replace(/\/$/, '')}/chat/completions`, {
+          method: 'POST',
+          headers: { 'content-type': 'application/json', authorization: `Bearer ${this.apiKey}` },
+          body: JSON.stringify(body),
+          signal: AbortSignal.timeout(120_000),
+        });
+      } catch (err) {
+        throw new ProviderUnavailableError(this.name, `injoignable (${(err as Error).message})`, err);
+      }
+      const data = (await res.json().catch(() => null)) as OpenAiResponse | null;
+      if (!res.ok || !data?.choices?.length) {
+        if (res.status === 429 && attempt < maxRetries && process.env.NODE_ENV !== 'test') {
+          const detail = data?.error?.message ?? '';
+          const match = detail.match(/try again in ([0-9.]+)\s*s/i);
+          const waitSec = match ? Math.min(parseFloat(match[1]) + 0.5, 15) : (attempt + 1) * 3;
+          await new Promise((r) => setTimeout(r, waitSec * 1000));
+          continue;
+        }
+        const detail = data?.error?.message ?? `HTTP ${res.status}`;
+        const short =
+          res.status === 401 || res.status === 403
+            ? 'clé API refusée'
+            : res.status === 429
+              ? 'quota ou limite de débit atteint'
+              : res.status >= 500
+                ? `erreur serveur (${res.status})`
+                : !data?.choices?.length
+                  ? detail.length <= 220 ? detail : 'réponse vide'
+                  : null;
+        if (short) throw new ProviderUnavailableError(this.name, short, detail);
+        throw new Error(`${this.name} : ${detail}`);
+      }
+
+      const choice = data.choices[0];
+      const toolCalls: ToolCall[] = (choice.message.tool_calls ?? []).map((c) => ({
+        id: c.id,
+        name: c.function.name,
+        input: parseArguments(c.function.arguments),
+      }));
+      return {
+        text: (choice.message.content ?? '').trim(),
+        toolCalls,
+        stopReason:
+          choice.finish_reason === 'length' ? 'max_tokens' : toolCalls.length ? 'tool_use' : 'end',
+        model: data.model ?? this.model,
+      };
     }
 
-    const choice = data.choices[0];
-    const toolCalls: ToolCall[] = (choice.message.tool_calls ?? []).map((c) => ({
-      id: c.id,
-      name: c.function.name,
-      input: parseArguments(c.function.arguments),
-    }));
-    return {
-      text: (choice.message.content ?? '').trim(),
-      toolCalls,
-      stopReason:
-        choice.finish_reason === 'length' ? 'max_tokens' : toolCalls.length ? 'tool_use' : 'end',
-      model: data.model ?? this.model,
-    };
+    throw new ProviderUnavailableError(this.name, 'quota ou limite de débit atteint');
   }
 }
 

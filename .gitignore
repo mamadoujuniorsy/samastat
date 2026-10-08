@@ -19,3 +19,8 @@ mobile/expo-env.d.ts
 
 # Modèles d embeddings téléchargés localement
 backend/.models/
+
+frontend/node_modules/
+backend/node_modules/
+
+

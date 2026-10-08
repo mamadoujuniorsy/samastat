@@ -1,3 +1,4 @@
+import fs from 'node:fs';
 import path from 'node:path';
 import { pipeline, type FeatureExtractionPipeline } from '@huggingface/transformers';
 
@@ -52,7 +53,10 @@ export function toVectorLiteral(v: number[]): string {
 }
 
 export function modelsDir(): string {
-  return process.env.SAMASTAT_MODELS_DIR ?? path.resolve(process.cwd(), '.models');
+  if (process.env.SAMASTAT_MODELS_DIR) return process.env.SAMASTAT_MODELS_DIR;
+  const backendPath = path.resolve(process.cwd(), 'backend', '.models');
+  if (fs.existsSync(backendPath)) return backendPath;
+  return path.resolve(process.cwd(), '.models');
 }
 
 export async function createEmbedder(

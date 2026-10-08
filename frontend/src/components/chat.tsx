@@ -55,7 +55,7 @@ export function Chat() {
   const [voiceRequestId, setVoiceRequestId] = useState<string | null>(null);
   const [draft, setDraft] = useState(initialSession.draft);
   const [voiceLanguage, setVoiceLanguage] = useState<"auto" | "fr" | "wo">("auto");
-  const endRef = useRef<HTMLDivElement>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const abortRef = useRef<AbortController | null>(null);
 
@@ -63,8 +63,14 @@ export function Chat() {
     saveSession(exchanges);
   }, [exchanges]);
 
+  /* Auto-scroll : on scroll tout en bas à chaque changement d'échanges. */
   useEffect(() => {
-    if (exchanges.length) endRef.current?.scrollIntoView({ block: "end" });
+    const el = scrollRef.current;
+    if (el && exchanges.length) {
+      requestAnimationFrame(() => {
+        el.scrollTo({ top: el.scrollHeight, behavior: "smooth" });
+      });
+    }
   }, [exchanges]);
 
   const update = useCallback((id: string, fn: (e: Exchange) => Exchange) => {
@@ -130,36 +136,62 @@ export function Chat() {
   );
 
   return (
-    <main className="flex-1 min-w-0 flex flex-col">
-      <div className="mx-auto w-full max-w-3xl px-4 sm:px-6 flex-1 flex flex-col">
-        {empty ? (
-          <EmptyState composer={form} onPick={(q) => void ask(q)} />
-        ) : (
-          <ol className="flex-1 py-8 space-y-12" aria-live="polite" aria-busy={pending}>
-            {exchanges.map((e, i) => (
-              <li key={e.id} className={`space-y-5 ${i > 0 ? "border-t border-border pt-10" : ""}`}>
-                <h2 className="display text-[1.5rem] sm:text-[1.75rem] leading-snug text-balance">{e.question}</h2>
-                <AnswerCard exchange={e} pending={pending && !e.response && !e.transportError} onAsk={(q) => void ask(q)} onRetry={() => retry(e)} autoSpeakLanguage={voiceRequestId === e.id ? e.voiceReplyLanguage : undefined} />
-              </li>
-            ))}
-            <li className="flex justify-end">
-              <button
-                type="button"
-                onClick={() => setExchanges([])}
-                disabled={pending}
-                className="min-h-9 text-xs text-text-muted underline underline-offset-4 hover:text-text disabled:opacity-50"
-              >
-                Effacer la session de ce navigateur
-              </button>
-            </li>
-            <div ref={endRef} />
-          </ol>
-        )}
-      </div>
+    <main className="flex flex-1 min-h-0 min-w-0 flex-col overflow-hidden pt-14">
+      {empty ? (
+        <EmptyState composer={form} onPick={(q) => void ask(q)} />
+      ) : (
+        <div className="flex flex-col flex-1 min-h-0">
+          {/* Scrollable message area */}
+          <div ref={scrollRef} className="flex-1 min-h-0 overflow-y-auto scroll-smooth">
+            <div className="mx-auto w-full max-w-3xl px-4 sm:px-6 py-6">
+              {exchanges.map((e, i) => (
+                <div key={e.id} className={i > 0 ? "mt-8" : ""}>
+                  {/* User message bubble */}
+                  <div className="flex justify-end mb-4">
+                    <div className="max-w-[85%] rounded-2xl rounded-br-md bg-accent/10 px-4 py-3 text-[15px] leading-relaxed ring-1 ring-accent/15">
+                      {e.question}
+                    </div>
+                  </div>
 
-      {!empty && (
-        <div className="sticky bottom-0 z-10 border-t border-border bg-bg/95 backdrop-blur">
-          <div className="mx-auto w-full max-w-3xl px-4 sm:px-6 py-3">{form}</div>
+                  {/* Assistant response */}
+                  <div className="flex gap-3">
+                    {/* Avatar */}
+                    <div className="mt-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-accent/20 to-ochre/20 text-sm ring-1 ring-white/10">
+                      🇸🇳
+                    </div>
+                    <div className="min-w-0 flex-1 space-y-4">
+                      <AnswerCard
+                        exchange={e}
+                        pending={pending && !e.response && !e.transportError}
+                        onAsk={(q) => void ask(q)}
+                        onRetry={() => retry(e)}
+                        autoSpeakLanguage={voiceRequestId === e.id ? e.voiceReplyLanguage : undefined}
+                      />
+                    </div>
+                  </div>
+                </div>
+              ))}
+
+              {/* Session controls */}
+              {exchanges.length > 0 && (
+                <div className="mt-6 flex justify-center">
+                  <button
+                    type="button"
+                    onClick={() => setExchanges([])}
+                    disabled={pending}
+                    className="min-h-9 rounded-full border border-border px-4 py-1.5 text-xs text-text-muted transition-colors hover:border-border-strong hover:text-text disabled:opacity-50"
+                  >
+                    Nouvelle conversation
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Fixed input bar at bottom */}
+          <div className="shrink-0 border-t border-border/50 bg-bg/80 backdrop-blur-xl">
+            <div className="mx-auto w-full max-w-3xl px-4 sm:px-6 py-3">{form}</div>
+          </div>
         </div>
       )}
     </main>

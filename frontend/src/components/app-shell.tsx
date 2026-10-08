@@ -90,7 +90,7 @@ export function AppShell({ current, children }: { current: Section; children: Re
         </aside>
       </div>}
 
-      <div className={current === "/" ? "min-h-dvh" : "min-h-[calc(100dvh-3.5rem)] pt-14"}>{children}</div>
+      <div className={current === "/" ? "flex h-dvh flex-col overflow-hidden" : "min-h-[calc(100dvh-3.5rem)] pt-14"}>{children}</div>
     </div>
   );
 }
