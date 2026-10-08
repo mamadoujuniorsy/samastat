@@ -1,7 +1,9 @@
-# Déployer SamaStat
+# Déployer SamaStat sur un VPS
 
 Ce guide est destiné à une personne qui récupère le dépôt sur un serveur vierge.
-La méthode recommandée pour la démonstration et la reprise par l'ANSD est Docker Compose.
+La méthode recommandée pour la démonstration et la reprise par l'ANSD est un VPS
+Linux avec Docker Compose. Les fonctions principales (site web, API, catalogue et
+recherche) ne nécessitent ni nom de domaine ni WhatsApp/Telegram.
 
 ## 1. Prérequis
 
@@ -14,7 +16,32 @@ La méthode recommandée pour la démonstration et la reprise par l'ANSD est Doc
 Le premier indexage télécharge un modèle local d'embeddings. Il peut prendre quelques minutes.
 Le volume Docker `samastat-models` conserve ce modèle pour les redémarrages suivants.
 
-## 2. Récupérer le projet
+## 2. Préparer le VPS
+
+Sur un VPS Ubuntu/Debian fraîchement installé, installer Docker et Git avec les
+paquets officiels de la distribution, puis vérifier. Exemple Ubuntu :
+
+```bash
+sudo apt update
+sudo apt install -y git docker.io docker-compose-plugin
+sudo systemctl enable --now docker
+sudo usermod -aG docker "$USER"
+```
+
+Reconnecter la session SSH après l'ajout au groupe `docker`, puis vérifier :
+
+```bash
+docker --version
+docker compose version
+git --version
+```
+
+Autoriser uniquement SSH et, si le site doit être consulté directement, les ports
+`3000` et `3001` dans le pare-feu du VPS. En production, il est préférable de
+n'exposer publiquement que le port HTTPS du reverse proxy et de garder `3001`
+interne.
+
+## 3. Récupérer le projet
 
 ```bash
 git clone <URL_DU_DEPOT>
@@ -23,7 +50,7 @@ cd samastat
 
 Ne jamais ajouter un fichier `.env` ou une clé de fournisseur au dépôt.
 
-## 3. Configurer l'environnement
+## 4. Configurer l'environnement
 
 ```bash
 cp .env.example .env
@@ -84,11 +111,18 @@ que de servir la voix locale expérimentale. Le fallback local ne doit être act
 Le service ASR local est inclus dans le profil `app` et reste disponible pour les
 installations qui choisissent explicitement `SAMASTAT_WOLOF_ASR_PROVIDER=local`.
 
-## 4 bis. Activer WhatsApp et Telegram
+## 5. Canaux WhatsApp et Telegram (facultatifs, non bloquants)
 
-Les deux canaux utilisent des webhooks HTTPS publics. Le serveur ANSD doit donc être
-accessible depuis Internet derrière un reverse proxy TLS. Le port interne de l'API reste
-`3001`.
+Le site web et l'API fonctionnent parfaitement sans ces canaux. Ils ne doivent pas
+bloquer l'installation, la démonstration ou la validation du projet.
+
+WhatsApp et Telegram utilisent des webhooks appelés par Internet. Leur activation
+demande donc une URL HTTPS publique vers l'API, généralement fournie par un nom de
+domaine et un reverse proxy TLS. Une adresse `localhost`, `127.0.0.1` ou `0.0.0.0`
+ne convient pas pour ces webhooks. Le port interne de l'API reste `3001`.
+
+Si l'ANSD ne souhaite pas activer ces canaux immédiatement, laisser toutes les
+variables ci-dessous vides : l'application restera opérationnelle.
 
 ### WhatsApp Cloud API
 
@@ -123,7 +157,7 @@ Après le démarrage de l'API, enregistrer le webhook depuis une machine autoris
 
 ```bash
 curl -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/setWebhook" \
-  --data-urlencode "url=  https://votre-domaine.example/telegram/webhook" \
+  --data-urlencode "url=https://votre-domaine.example/telegram/webhook" \
   --data-urlencode "secret_token=${TELEGRAM_WEBHOOK_SECRET}" \
   --data-urlencode 'allowed_updates=["message"]'
 ```
@@ -140,7 +174,7 @@ les valeurs trouvées et les sources ANSD. Les vocaux Telegram ne sont pas activ
 ce premier lot afin de garder la démonstration courte et fiable ; WhatsApp conserve
 son support vocal existant.
 
-## 4. Construire et démarrer les services
+## 6. Construire et démarrer les services
 
 ```bash
 docker compose --profile app up -d --build
@@ -160,7 +194,7 @@ Pour une machine distante, remplacer `localhost` par le nom ou l'adresse du serv
 dans l'URL utilisée par le navigateur. Un reverse proxy HTTPS est recommandé si le
 service doit être exposé sur Internet.
 
-## 5. Initialiser la base et le catalogue
+## 7. Initialiser la base et le catalogue
 
 Exécuter ces commandes une seule fois après le premier démarrage :
 
@@ -179,7 +213,7 @@ Le catalogue livré contient actuellement :
 La commande `index` peut être relancée sans danger. Elle ne recalcule que les
 embeddings manquants ou devenus obsolètes.
 
-## 6. Vérifier le déploiement
+## 8. Vérifier le déploiement
 
 Vérifier d'abord l'état de l'API :
 
@@ -225,7 +259,16 @@ curl -X POST http://localhost:3001/ask \
 
 Ouvrir ensuite `http://localhost:3000` dans un navigateur.
 
-## 7. Créer le premier compte ANSD (optionnel)
+Depuis un autre ordinateur, utiliser l'adresse IP du VPS :
+
+```text
+http://ADRESSE_IP_DU_VPS:3000
+```
+
+Cette URL suffit pour tester le site web. Aucun domaine n'est requis pour ce
+parcours local ou réseau.
+
+## 9. Créer le premier compte ANSD (optionnel)
 
 Le compte initial peut être créé automatiquement au premier démarrage si les trois
 variables suivantes sont configurées dans `.env` :
@@ -248,7 +291,7 @@ docker compose exec -e STAFF_PASSWORD='mot-de-passe-long' api \
 
 La connexion du personnel est disponible sur `http://localhost:3000/connexion`.
 
-## 8. Exploitation courante
+## 10. Exploitation courante
 
 Voir les logs de l'API :
 
@@ -277,7 +320,16 @@ docker compose --profile app down
 Les volumes `samastat-pgdata` et `samastat-models` ne doivent pas être supprimés
 si l'on souhaite conserver la base et le modèle téléchargé.
 
-## 9. Mise à jour du code
+Activer le redémarrage automatique après un reboot du VPS :
+
+```bash
+docker compose --profile app up -d
+```
+
+Pour une installation durable, ajouter un service systemd ou une tâche de
+démarrage qui exécute cette commande après le démarrage de Docker.
+
+## 11. Mise à jour du code
 
 ```bash
 git pull
@@ -295,7 +347,28 @@ invalidées en redémarrant Redis :
 docker compose restart redis
 ```
 
-## 10. Dépannage rapide
+## 12. Exposer le site proprement (recommandé)
+
+Pour une utilisation publique, placer Nginx, Caddy ou Traefik devant le conteneur
+web. Le reverse proxy fournit HTTPS et transmet le trafic vers :
+
+```text
+web  -> http://127.0.0.1:3000
+api  -> http://127.0.0.1:3001
+```
+
+Le site peut être publié seul. Les routes de webhook facultatives à transmettre
+vers l'API sont :
+
+```text
+/whatsapp/webhook
+/telegram/webhook
+```
+
+Il n'est pas nécessaire de publier ces routes si WhatsApp et Telegram ne sont pas
+activés.
+
+## 13. Dépannage rapide
 
 ### `api` s'arrête immédiatement
 
@@ -344,12 +417,12 @@ docker compose --profile app up -d --build
 
 Puis reprendre à l'étape 5.
 
-## 11. Limites connues
+## 14. Limites connues
 
 - Le catalogue fourni est un jeu de données vérifié et versionné ; il ne constitue pas
   automatiquement l'intégralité des données publiées par l'ANSD.
-- Les canaux SMS et WhatsApp nécessitent leurs comptes fournisseurs et leurs variables
-  d'environnement propres.
+- Les canaux SMS, WhatsApp et Telegram sont optionnels et nécessitent leurs comptes
+  fournisseurs, leurs secrets et, pour les webhooks, une URL HTTPS publique.
 - La traduction et la synthèse vocale Wolof sont optionnelles et nécessitent davantage
   de mémoire lorsqu'elles sont activées.
 - La commande `index` est nécessaire avant d'obtenir la recherche sémantique complète.

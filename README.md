@@ -64,6 +64,7 @@ reformulations que le catalogue peut satisfaire.
 - Wolof, approche graduée (voir `docs/wolof.md`) : lexique de formulations courantes → mots-clés français et détection de langue (niveau 1) ; traduction automatique locale wolof ↔ français par NLLB-200 en ONNX, la question traduite étant affichée comme étape et la réponse rendue en wolof avec les valeurs, périodes et sources protégées par jetons (niveau 2, `SAMASTAT_WOLOF_TRANSLATION=1`) ; voix wolof locale expérimentale, `GET/POST /wolof/tts` (niveau 3, `SAMASTAT_WOLOF_TTS=1`). Modèles sous CC BY-NC 4.0, téléchargés à l'activation.
 - Tableau de bord d'usage anonyme destiné à l'ANSD (`/usage`) : questions par jour, répartition linguistique, thématique et géographique (carte), questions restées sans donnée, indicateurs mobilisés, déclenchements de la garde
 - Canal WhatsApp via l'API Cloud de Meta : webhook `GET/POST /whatsapp/webhook` (vérification du jeton, signature HMAC, contexte de conversation par numéro en mémoire), inactif tant que les variables `WHATSAPP_*` sont vides. Non testé en conditions réelles faute de compte Meta Business.
+- Canal Telegram via Bot API : webhook `POST /telegram/webhook`, secret `X-Telegram-Bot-Api-Secret-Token`, réponses texte sourcées et contexte court, inactif tant que `TELEGRAM_BOT_TOKEN` est vide. Les webhooks sont une extension facultative et ne bloquent pas le déploiement web.
 
 ## Démarrage
 
@@ -73,7 +74,10 @@ en cas de clé invalide, de quota atteint ou de panne.
 
 Pour une installation destinée à l'ANSD ou à un serveur, suivre en priorité le
 [guide de déploiement Docker](./DEPLOYMENT.md). Il décrit le parcours complet depuis
-un clone propre, l'initialisation du catalogue, la vérification et le dépannage.
+un clone propre sur un VPS, l'initialisation du catalogue, la vérification, la
+mise à jour et le dépannage. Le site fonctionne avec l'adresse IP du VPS ; un
+nom de domaine HTTPS est uniquement nécessaire pour activer les webhooks WhatsApp
+ou Telegram.
 
 ```bash
 npm install
