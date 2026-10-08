@@ -76,7 +76,7 @@ export function LoginForm() {
       <button
         type="submit"
         disabled={pending}
-        className="w-full min-h-11 rounded-md bg-accent px-4 text-sm font-medium text-white hover:bg-accent-strong disabled:opacity-60 dark:text-bg"
+        className="w-full min-h-11 rounded-md bg-accent px-4 text-sm font-medium text-on-accent hover:bg-accent-strong disabled:opacity-60"
       >
         {pending ? "Connexion…" : "Se connecter"}
       </button>

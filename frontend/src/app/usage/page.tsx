@@ -59,7 +59,7 @@ export default async function UsagePage({ searchParams }: PageProps<"/usage">) {
 
       <main className="mx-auto w-full max-w-6xl px-4 py-8 space-y-8 flex-1 sm:px-6 lg:px-8">
         <div className="flex flex-wrap items-baseline justify-between gap-3">
-          <div><p className="rule text-[11px] font-medium tracking-wide text-text-faint">Espace ANSD</p><h1 className="display text-[2rem]">Tableau de bord d&apos;usage</h1></div>
+          <div><p className="rule text-xs font-medium tracking-wide text-text-faint">Espace ANSD</p><h1 className="display text-[2rem]">Tableau de bord d&apos;usage</h1></div>
           <nav className="text-sm text-text-muted flex gap-3" aria-label="Fenêtre d'analyse">
             {[7, 30, 90].map((d) => (
               <a

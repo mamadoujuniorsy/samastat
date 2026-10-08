@@ -16,7 +16,7 @@ export default function MethodePage() {
           </p>
         </header>
 
-        <Section title="Le modèle de langage n'écrit jamais un chiffre">
+        <Section title="Les valeurs sont insérées depuis le catalogue">
           <p>
             Le modèle comprend la question, choisit l&apos;indicateur dans le catalogue au moyen d&apos;outils, puis rédige une
             phrase où chaque valeur est un emplacement. Le serveur remplace ces emplacements par les enregistrements
@@ -24,6 +24,7 @@ export default function MethodePage() {
             qu&apos;il n&apos;a pas réellement récupéré, la phrase est rejetée et remplacée par un texte construit uniquement
             à partir des enregistrements. Cette garde apparaît dans les étapes de chaque réponse.
           </p>
+          <p>Cette vérification limite les chiffres inventés, mais ne garantit pas que le modèle a choisi le bon indicateur ou correctement formulé son interprétation. Vérifiez le territoire, la période, l’unité et la source avant de réutiliser une réponse.</p>
         </Section>
 
         <Section title="Chaque réponse est vérifiable">
@@ -60,19 +61,23 @@ export default function MethodePage() {
           <p>
             Approche graduée : un lexique de formulations courantes, puis une traduction automatique locale (NLLB-200)
             dont la version wolof d&apos;une réponse est produite après avoir protégé chaque valeur, période et source, et
-            une voix wolof expérimentale. Les erreurs de traduction ne peuvent pas toucher un chiffre.
+            une voix wolof expérimentale. Les chiffres sont protégés pendant la traduction ; le sens du texte peut toutefois être imparfait.
           </p>
+          <p>Pour la dictée, l’audio est transmis à Groq pour transcription. Relisez et corrigez le texte avant envoi ; l’envoi automatique reste une option. La reconnaissance du wolof est expérimentale.</p>
         </Section>
 
         <Section title="Vie privée et usage">
           <p>
-            Les questions sont conservées sans aucun identifiant d&apos;utilisateur. Le tableau de bord{" "}
+            L’historique local reste dans votre navigateur. Les questions et le contexte récent sont transmis à l’API.
+            Le texte des questions est conservé sans identifiant de compte, mais peut contenir des données personnelles
+            si vous en saisissez : évitez les noms, numéros de téléphone et autres renseignements sensibles. Le tableau de bord{" "}
             <Link href="/usage" className="underline underline-offset-4">
               Usage
             </Link>{" "}
             restitue à l&apos;ANSD les indicateurs demandés, les questions restées sans donnée et les langues des
             demandes, pour orienter la programmation statistique.
           </p>
+          <p>Les réponses chiffrées ou associées à des enquêtes sont également enregistrées pour les liens de partage. Toute personne disposant du lien peut consulter la question et la réponse, sans connexion. Effacer la session du navigateur ne supprime pas ces enregistrements côté serveur.</p>
         </Section>
 
       </main>

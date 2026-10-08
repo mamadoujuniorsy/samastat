@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import type { Exchange, HistoryTurn } from "@/lib/types";
 import { askStream } from "@/lib/ask-stream";
 import { QuestionForm } from "./question-form";
@@ -41,37 +42,56 @@ function saveSession(exchanges: Exchange[]) {
 
 /** Fil de questions/réponses en flux : une seule question en cours à la fois, interruptible. */
 export function Chat() {
-  const [initialSession] = useState(() => {
-    if (typeof window === "undefined") return { exchanges: [] as Exchange[], draft: "" };
-    const params = new URLSearchParams(window.location.search);
-    const clear = params.get("new") === "1";
-    if (clear) window.localStorage.removeItem(STORAGE_KEY);
-    const result = { exchanges: clear ? [] : loadSession(), draft: params.get("q") ?? "" };
-    if (clear || params.has("q")) window.history.replaceState(null, "", "/");
-    return result;
-  });
-  const [exchanges, setExchanges] = useState<Exchange[]>(initialSession.exchanges);
+  const params = useSearchParams();
+  const [exchanges, setExchanges] = useState<Exchange[]>([]);
+  const [hydrated, setHydrated] = useState(false);
   const [pending, setPending] = useState(false);
   const [voiceRequestId, setVoiceRequestId] = useState<string | null>(null);
-  const [draft, setDraft] = useState(initialSession.draft);
+  const [draft, setDraft] = useState("");
+  const [draftVoiceLanguage, setDraftVoiceLanguage] = useState<"fr" | "wo" | null>(null);
+  const [autoSendVoice, setAutoSendVoice] = useState(false);
   const [voiceLanguage, setVoiceLanguage] = useState<"auto" | "fr" | "wo">("auto");
-  const scrollRef = useRef<HTMLDivElement>(null);
+  const endRef = useRef<HTMLLIElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const abortRef = useRef<AbortController | null>(null);
+  const restoredRef = useRef(false);
 
+  /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
-    saveSession(exchanges);
-  }, [exchanges]);
-
-  /* Auto-scroll : on scroll tout en bas à chaque changement d'échanges. */
-  useEffect(() => {
-    const el = scrollRef.current;
-    if (el && exchanges.length) {
-      requestAnimationFrame(() => {
-        el.scrollTo({ top: el.scrollHeight, behavior: "smooth" });
-      });
+    const first = !restoredRef.current;
+    const clear = params.get("new") === "1";
+    if (!first && !clear && !params.has("q")) return;
+    restoredRef.current = true;
+    if (first) {
+      try { setAutoSendVoice(localStorage.getItem("samastat.voice.autoSend") === "true"); } catch { /* stockage indisponible */ }
     }
-  }, [exchanges]);
+    if (clear) {
+      abortRef.current?.abort();
+      abortRef.current = null;
+      setPending(false);
+      setVoiceRequestId(null);
+    }
+    if (first || clear) setExchanges(clear ? [] : loadSession());
+    setDraft(params.get("q") ?? "");
+    setDraftVoiceLanguage(null);
+    setHydrated(true);
+    if (clear || params.has("q")) {
+      const next = new URLSearchParams(params.toString());
+      next.delete("new"); next.delete("q");
+      window.history.replaceState(null, "", next.size ? `/?${next}` : "/");
+    }
+  }, [params]);
+  /* eslint-enable react-hooks/set-state-in-effect */
+
+  useEffect(() => {
+    if (hydrated) saveSession(exchanges);
+  }, [exchanges, hydrated]);
+
+  useEffect(() => () => abortRef.current?.abort(), []);
+
+  useEffect(() => {
+    if (exchanges.length) endRef.current?.scrollIntoView({ block: "end" });
+  }, [exchanges.length]);
 
   const update = useCallback((id: string, fn: (e: Exchange) => Exchange) => {
     setExchanges((prev) => prev.map((e) => (e.id === id ? fn(e) : e)));
@@ -80,18 +100,22 @@ export function Chat() {
   const ask = useCallback(
     async (question: string, language?: "fr" | "wo", fromVoice = false) => {
       const q = question.trim();
-      if (!q || pending) return;
+      if (q.length < 2 || pending || abortRef.current) return;
       const id = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
       setVoiceRequestId(fromVoice && language ? id : null);
       const history = historyOf(exchanges);
       setExchanges((prev) => [...prev, { id, question: q, steps: [], ...(fromVoice && language ? { voiceReplyLanguage: language } : {}) }]);
       setDraft("");
+      setDraftVoiceLanguage(null);
       setPending(true);
       const controller = new AbortController();
       abortRef.current = controller;
 
       try {
-        const response = await askStream(q, history, () => undefined, controller.signal, language);
+        const response = await askStream(q, history, (event) => {
+          if (event.type === "step") update(id, (e) => ({ ...e, steps: [...e.steps, event.step] }));
+        }, controller.signal, language);
+        if (controller.signal.aborted) return;
         update(id, (e) => ({ ...e, response }));
       } catch (err) {
         if (controller.signal.aborted) {
@@ -101,9 +125,11 @@ export function Chat() {
           update(id, (e) => ({ ...e, transportError: message }));
         }
       } finally {
-        abortRef.current = null;
-        setPending(false);
-        inputRef.current?.focus();
+        if (abortRef.current === controller) {
+          abortRef.current = null;
+          setPending(false);
+          inputRef.current?.focus();
+        }
       }
     },
     [pending, exchanges, update],
@@ -113,85 +139,72 @@ export function Chat() {
 
   const retry = useCallback(
     (exchange: Exchange) => {
+      if (pending || abortRef.current) return;
       setExchanges((prev) => prev.filter((e) => e.id !== exchange.id));
-      setTimeout(() => void ask(exchange.question, exchange.voiceReplyLanguage, Boolean(exchange.voiceReplyLanguage)), 0);
+      void ask(exchange.question, exchange.voiceReplyLanguage, Boolean(exchange.voiceReplyLanguage));
     },
-    [ask],
+    [ask, pending],
   );
 
   const empty = exchanges.length === 0;
+  const latestResponse = exchanges.at(-1)?.response;
   const form = (
     <QuestionForm
       ref={inputRef}
       value={draft}
-      onChange={setDraft}
-      onSubmit={(q) => void ask(q)}
+      onChange={(text) => { setDraft(text); if (!text.trim()) setDraftVoiceLanguage(null); }}
+      onSubmit={(q) => void ask(q, draftVoiceLanguage ?? undefined, Boolean(draftVoiceLanguage))}
       onStop={stop}
       pending={pending}
       language={voiceLanguage}
       onLanguageChange={setVoiceLanguage}
-      onTranscribed={(text, language) => void ask(text, language, true)}
+      onTranscribed={(text, language, autoSendAllowed) => {
+        setDraftVoiceLanguage(language);
+        if (autoSendVoice && autoSendAllowed) void ask(text, language, true);
+      }}
+      autoSendVoice={autoSendVoice}
+      onAutoSendVoiceChange={(enabled) => {
+        setAutoSendVoice(enabled);
+        try { localStorage.setItem("samastat.voice.autoSend", String(enabled)); } catch { /* stockage indisponible */ }
+      }}
       prominent={empty}
     />
   );
 
   return (
-    <main className="flex flex-1 min-h-0 min-w-0 flex-col overflow-hidden pt-14">
-      {empty ? (
-        <EmptyState composer={form} onPick={(q) => void ask(q)} />
-      ) : (
-        <div className="flex flex-col flex-1 min-h-0">
-          {/* Scrollable message area */}
-          <div ref={scrollRef} className="flex-1 min-h-0 overflow-y-auto scroll-smooth">
-            <div className="mx-auto w-full max-w-3xl px-4 sm:px-6 py-6">
-              {exchanges.map((e, i) => (
-                <div key={e.id} className={i > 0 ? "mt-8" : ""}>
-                  {/* User message bubble */}
-                  <div className="flex justify-end mb-4">
-                    <div className="max-w-[85%] rounded-2xl rounded-br-md bg-accent/10 px-4 py-3 text-[15px] leading-relaxed ring-1 ring-accent/15">
-                      {e.question}
-                    </div>
-                  </div>
+    <main className="flex-1 min-w-0 flex flex-col">
+      <p role="status" aria-atomic="true" className="sr-only">
+        {latestResponse ? "Réponse disponible. Retrouvez le résultat et les sources dans la conversation." : ""}
+      </p>
+      <div className="mx-auto w-full max-w-3xl px-4 sm:px-6 flex-1 flex flex-col">
+        {empty ? (
+          <EmptyState composer={form} onPick={(q) => void ask(q)} />
+        ) : (
+          <ol className="flex-1 py-8 space-y-12" aria-label="Conversation">
+            {exchanges.map((e, i) => (
+              <li key={e.id} className={`space-y-5 ${i > 0 ? "border-t border-border pt-10" : ""}`}>
+                <h2 className="display text-[1.5rem] sm:text-[1.75rem] leading-snug text-balance">{e.question}</h2>
+                <AnswerCard exchange={e} pending={pending && !e.response && !e.transportError && !e.aborted} onAsk={(q) => void ask(q)} onRetry={() => retry(e)} autoSpeakLanguage={voiceRequestId === e.id ? e.voiceReplyLanguage : undefined} />
+              </li>
+            ))}
+            <li className="flex justify-end">
+              <button
+                type="button"
+                onClick={() => setExchanges([])}
+                disabled={pending}
+                className="min-h-11 text-xs text-text-muted underline underline-offset-4 hover:text-text disabled:opacity-50"
+              >
+                Effacer la session de ce navigateur
+              </button>
+            </li>
+            <li ref={endRef} aria-hidden="true" />
+          </ol>
+        )}
+      </div>
 
-                  {/* Assistant response */}
-                  <div className="flex gap-3">
-                    {/* Avatar */}
-                    <div className="mt-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-accent/20 to-ochre/20 text-sm ring-1 ring-white/10">
-                      🇸🇳
-                    </div>
-                    <div className="min-w-0 flex-1 space-y-4">
-                      <AnswerCard
-                        exchange={e}
-                        pending={pending && !e.response && !e.transportError}
-                        onAsk={(q) => void ask(q)}
-                        onRetry={() => retry(e)}
-                        autoSpeakLanguage={voiceRequestId === e.id ? e.voiceReplyLanguage : undefined}
-                      />
-                    </div>
-                  </div>
-                </div>
-              ))}
-
-              {/* Session controls */}
-              {exchanges.length > 0 && (
-                <div className="mt-6 flex justify-center">
-                  <button
-                    type="button"
-                    onClick={() => setExchanges([])}
-                    disabled={pending}
-                    className="min-h-9 rounded-full border border-border px-4 py-1.5 text-xs text-text-muted transition-colors hover:border-border-strong hover:text-text disabled:opacity-50"
-                  >
-                    Nouvelle conversation
-                  </button>
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Fixed input bar at bottom */}
-          <div className="shrink-0 border-t border-border/50 bg-bg/80 backdrop-blur-xl">
-            <div className="mx-auto w-full max-w-3xl px-4 sm:px-6 py-3">{form}</div>
-          </div>
+      {!empty && (
+        <div className="sticky bottom-0 z-10 border-t border-border bg-bg pb-[env(safe-area-inset-bottom)]">
+          <div className="mx-auto w-full max-w-3xl px-4 sm:px-6 py-3">{form}</div>
         </div>
       )}
     </main>

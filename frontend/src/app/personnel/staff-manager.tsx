@@ -88,7 +88,7 @@ export function StaffManager({ initialStaff }: { initialStaff: StaffAccount[] })
           </div>
           {error && <p role="alert" className="rounded-md bg-danger-soft px-3 py-2 text-sm text-danger">{error}</p>}
           {notice && <p role="status" className="rounded-md bg-accent-soft px-3 py-2 text-sm">{notice}</p>}
-          <button type="submit" disabled={pending} className="min-h-11 w-full rounded-md bg-accent px-4 text-sm font-medium text-white transition-colors hover:bg-accent-strong disabled:opacity-60 dark:text-bg">
+          <button type="submit" disabled={pending} className="min-h-11 w-full rounded-md bg-accent px-4 text-sm font-medium text-on-accent transition-colors hover:bg-accent-strong disabled:opacity-60">
             {pending ? 'Création…' : 'Créer le compte'}
           </button>
         </form>

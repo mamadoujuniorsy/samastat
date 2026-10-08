@@ -2,7 +2,7 @@
 
 /*
   Système de design SamaStat (docs/DESIGN.md), révision « finale » :
-  papier chaud, encre profonde, un accent vert institutionnel, un ocre discret pour les filets,
+  papier chaud, encre profonde, un accent bleu, un ocre discret pour les filets,
   serif éditoriale pour les titres et les chiffres-vedettes, sans-serif pour l'interface.
   Thème clair par défaut ; sombre par [data-theme="dark"] ou préférence système.
 */
@@ -19,6 +19,7 @@
   --accent: #175c91;
   --accent-strong: #10466f;
   --accent-soft: #e6f0f8;
+  --on-accent: #ffffff;
   --ochre: #b8791f;
   --ochre-soft: #f6ead6;
   --danger: #9b1c1c;
@@ -28,24 +29,8 @@
 }
 
 .chat-home {
-  --bg: #0d0d0e;
-  --bg-elevated: #111112;
-  --surface: #1b1b1d;
-  --surface-muted: #202022;
-  --border: #303033;
-  --border-strong: #4a4a4f;
-  --text: #f4f4f5;
-  --text-muted: #b3b3b8;
-  --text-faint: #929298;
-  --accent: #76a9fa;
-  --accent-strong: #91baff;
-  --accent-soft: #1c2b45;
-  --danger: #ff8989;
-  --danger-soft: #351e20;
-  --focus: #76a9fa;
   background: var(--bg);
   color: var(--text);
-  color-scheme: dark;
 }
 
 :root[data-theme="dark"] {
@@ -61,6 +46,7 @@
   --accent: #83b8e3;
   --accent-strong: #a3cdee;
   --accent-soft: #1d3344;
+  --on-accent: #141517;
   --ochre: #e0a84a;
   --ochre-soft: #3a2e1a;
   --danger: #f08a8a;
@@ -79,10 +65,11 @@
     --border-strong: #545963;
     --text: #ecebe6;
     --text-muted: #aaa89f;
-    --text-faint: #7d7b73;
+    --text-faint: #aaa89f;
     --accent: #83b8e3;
     --accent-strong: #a3cdee;
     --accent-soft: #1d3344;
+    --on-accent: #141517;
     --ochre: #e0a84a;
     --ochre-soft: #3a2e1a;
     --danger: #f08a8a;
@@ -105,6 +92,7 @@
   --color-accent: var(--accent);
   --color-accent-strong: var(--accent-strong);
   --color-accent-soft: var(--accent-soft);
+  --color-on-accent: var(--on-accent);
   --color-ochre: var(--ochre);
   --color-ochre-soft: var(--ochre-soft);
   --color-danger: var(--danger);
