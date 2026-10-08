@@ -79,33 +79,21 @@ export function AnswerCard({ exchange, pending, onAsk, onRetry, autoSpeakLanguag
     <article className="space-y-5" aria-label="Réponse de SamaStat">
       {single && <Headline record={single} />}
 
-      {response.answerWolof ? (
+      {response.meta.language === "wo" ? (
+        <p className="text-[17px] leading-relaxed whitespace-pre-wrap" lang="wo">
+          {response.answerWolof ?? response.answer}
+        </p>
+      ) : response.answerWolof ? (
         <div className="space-y-3">
-          {response.meta.language === "wo" ? (
-            <>
-              <p className="text-base font-medium leading-relaxed whitespace-pre-wrap" lang="wo">
-                {response.answerWolof}
-              </p>
-              <div className="rounded-xl border border-border/60 bg-surface-muted/40 p-3 space-y-1">
-                <span className="text-[11px] font-semibold text-text-muted uppercase tracking-wider">Version française</span>
-                <p className="text-sm leading-relaxed whitespace-pre-wrap text-text-muted" lang="fr">
-                  {response.answer}
-                </p>
-              </div>
-            </>
-          ) : (
-            <>
-              <p className="text-[17px] leading-relaxed whitespace-pre-wrap" lang="fr">
-                {response.answer}
-              </p>
-              <div className="rounded-xl border border-border/60 bg-surface-muted/40 p-3 space-y-1">
-                <span className="text-[11px] font-semibold text-accent uppercase tracking-wider">Traduction wolof (ANSD)</span>
-                <p className="text-sm font-medium leading-relaxed whitespace-pre-wrap text-text" lang="wo">
-                  {response.answerWolof}
-                </p>
-              </div>
-            </>
-          )}
+          <p className="text-[17px] leading-relaxed whitespace-pre-wrap" lang="fr">
+            {response.answer}
+          </p>
+          <div className="rounded-xl border border-border/60 bg-surface-muted/40 p-3 space-y-1">
+            <span className="text-[11px] font-semibold text-accent uppercase tracking-wider">Traduction wolof (ANSD)</span>
+            <p className="text-sm font-medium leading-relaxed whitespace-pre-wrap text-text" lang="wo">
+              {response.answerWolof}
+            </p>
+          </div>
           <p className="text-xs text-text-muted">
             Wolof produit par traduction automatique locale (NLLB-200) ; les valeurs, périodes et sources ne passent pas par le traducteur.
           </p>
@@ -435,7 +423,22 @@ function VoiceResponse({ response, autoSpeakLanguage }: { response: Exchange["re
         </p>
       )}
       <span className="inline-flex flex-wrap items-center gap-x-2.5">
-      {response.answerWolof ? (
+      {response.meta.language === "wo" ? (
+        <ActionButton
+          label={
+            state === "loading" && activeLang === "wo"
+              ? "Préparation voix wolof…"
+              : state === "playing" && activeLang === "wo"
+                ? "Arrêter la voix wolof"
+                : "Écouter la réponse en wolof"
+          }
+          onClick={() => {
+            if (state === "playing" && activeLang === "wo") stop();
+            else void play("wo");
+          }}
+          active={state === "playing" && activeLang === "wo"}
+        />
+      ) : response.answerWolof ? (
         <>
           <ActionButton
             label={
