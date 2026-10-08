@@ -13,6 +13,10 @@ recherche) ne nécessitent ni nom de domaine ni WhatsApp/Telegram.
 - Environ 5 Go d'espace disque libre pour les images, les données et les modèles locaux
 - Une clé `ANTHROPIC_API_KEY` ou `GROQ_API_KEY` pour poser de vraies questions
 
+Les liens officiels pour créer ou récupérer les identifiants sont regroupés dans la
+[section 4.1](#41-où-obtenir-les-clés-et-identifiants). Ne jamais copier une clé
+dans GitHub, une capture d'écran ou un ticket public.
+
 Le premier indexage télécharge un modèle local d'embeddings. Il peut prendre quelques minutes.
 Le volume Docker `samastat-models` conserve ce modèle pour les redémarrages suivants.
 
@@ -111,6 +115,47 @@ que de servir la voix locale expérimentale. Le fallback local ne doit être act
 Le service ASR local est inclus dans le profil `app` et reste disponible pour les
 installations qui choisissent explicitement `SAMASTAT_WOLOF_ASR_PROVIDER=local`.
 
+### 4.1 Où obtenir les clés et identifiants
+
+| Variable | Où l'obtenir | Obligatoire ? |
+|---|---|---|
+| `ANTHROPIC_API_KEY` | [Console Anthropic - API keys](https://console.anthropic.com/settings/keys) | Une clé LLM, avec Groq |
+| `GROQ_API_KEY` | [Console Groq - API keys](https://console.groq.com/keys) | Une clé LLM, avec Anthropic |
+| `HUGGINGFACE_HUB_TOKEN` | [Hugging Face - User access tokens](https://huggingface.co/settings/tokens) | Seulement pour Kiriku local |
+| `SOYNADE_API_KEY` | [Site officiel Soynade](https://soynade.ai/) puis l'espace développeur du compte | Seulement pour le TTS Soynade |
+| `WHATSAPP_*` | [Meta for Developers](https://developers.facebook.com/) et [WhatsApp Cloud API](https://developers.facebook.com/docs/whatsapp/cloud-api) | Seulement pour WhatsApp |
+| `TELEGRAM_BOT_TOKEN` | Bot Telegram officiel [@BotFather](https://t.me/BotFather) avec `/newbot` | Seulement pour Telegram |
+
+Les pages de console peuvent demander la création d'un compte, l'activation de la
+facturation ou des autorisations supplémentaires. Ces conditions dépendent du
+fournisseur et ne sont pas gérées par SamaStat.
+
+Les valeurs suivantes ne sont pas récupérées sur un site externe :
+
+- `SAMASTAT_AUTH_SECRET` : générer une chaîne aléatoire longue pour les sessions ANSD ;
+- `TELEGRAM_WEBHOOK_SECRET` : générer une chaîne aléatoire longue pour sécuriser le webhook ;
+- `WHATSAPP_VERIFY_TOKEN` : choisir une chaîne aléatoire, puis saisir exactement la
+  même valeur dans Meta et dans `.env`.
+
+Sous Linux, générer un secret sans l'afficher dans le dépôt avec :
+
+```bash
+openssl rand -hex 32
+```
+
+Sous PowerShell :
+
+```powershell
+[Convert]::ToHexString((1..32 | ForEach-Object { Get-Random -Maximum 256 }))
+```
+
+Les tokens et clés sont à conserver dans un gestionnaire de secrets ou dans le fichier
+`.env` du serveur avec des permissions restrictives :
+
+```bash
+chmod 600 .env
+```
+
 ## 5. Canaux WhatsApp et Telegram (facultatifs, non bloquants)
 
 Le site web et l'API fonctionnent parfaitement sans ces canaux. Ils ne doivent pas
@@ -125,6 +170,11 @@ Si l'ANSD ne souhaite pas activer ces canaux immédiatement, laisser toutes les
 variables ci-dessous vides : l'application restera opérationnelle.
 
 ### WhatsApp Cloud API
+
+La création de l'application et la configuration du numéro de test se font dans
+[Meta for Developers](https://developers.facebook.com/). Consulter la
+[documentation officielle du webhook WhatsApp](https://developers.facebook.com/docs/whatsapp/cloud-api/webhooks)
+pour les étapes et les permissions qui peuvent évoluer.
 
 Renseigner dans `.env` :
 
@@ -146,7 +196,7 @@ minimum l'événement `messages`. Le webhook accepte les questions texte et les 
 
 ### Telegram Bot API
 
-Créer un bot avec `@BotFather`, puis renseigner :
+Créer un bot avec [@BotFather](https://t.me/BotFather), puis renseigner :
 
 ```dotenv
 TELEGRAM_BOT_TOKEN=jeton-du-bot
@@ -162,6 +212,11 @@ curl -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/setWebhook" \
   --data-urlencode 'allowed_updates=["message"]'
 ```
 
+La documentation officielle de la méthode est disponible dans
+[Telegram Bot API - setWebhook](https://core.telegram.org/bots/api#setwebhook).
+Le bot Telegram de démonstration accepte les messages texte ; les messages vocaux
+Telegram ne sont pas activés dans cette version.
+
 Tester la configuration :
 
 ```bash
@@ -170,9 +225,7 @@ curl http://localhost:3001/telegram/status
 ```
 
 Envoyer ensuite un message texte au bot. SamaStat répond avec la réponse de l'agent,
-les valeurs trouvées et les sources ANSD. Les vocaux Telegram ne sont pas activés dans
-ce premier lot afin de garder la démonstration courte et fiable ; WhatsApp conserve
-son support vocal existant.
+les valeurs trouvées et les sources ANSD. WhatsApp conserve son support vocal existant.
 
 ## 6. Construire et démarrer les services
 
