@@ -21,7 +21,6 @@ def get_recognizer():
             "automatic-speech-recognition",
             model=MODEL_ID,
             device=DEVICE,
-            cache_dir=MODEL_CACHE,
         )
     return recognizer
 
