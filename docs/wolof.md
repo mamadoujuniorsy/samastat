@@ -47,6 +47,18 @@ WaxalNLP (AIMS Sénégal), 16 kHz, 40 à 115 Mo, moins d'une seconde par phrase 
 présente comme un point de contrôle de substitution, faute de modèle MMS natif pour le wolof. L'interface
 l'indique (« voix wolof expérimentale »).
 
+Pour les réponses statistiques à une seule valeur, SamaStat utilise en priorité une formulation wolof
+courte construite depuis l'enregistrement ANSD (`Dakar am na ... nit ci ...`) au lieu de faire traduire
+librement toute la phrase française par NLLB-200. Cela réduit les erreurs grammaticales et donne au TTS
+un texte plus simple à prononcer. Les valeurs restent celles de la base et ne sont jamais produites par
+le modèle linguistique.
+
+Le modèle `galsenai/xTTS-v2-wolof` est une piste ultérieure prometteuse, mais son checkpoint dépasse
+7 Go, nécessite une stack Python/xTTS et une voix de référence, et sa documentation signale des
+difficultés avec les nombres et le texte wolof-français mélangé. Il n'est pas retenu pour le déploiement
+du hackathon sous 48 heures ; son intégration fera l'objet d'un service séparé après la soumission,
+avec validation par un locuteur wolof.
+
 Reconnaissance vocale web : le navigateur enregistre un court clip puis le backend le transmet à Groq
 Whisper (`whisper-large-v3-turbo`) pour transcription. L'audio quitte donc le navigateur et est envoyé à
 un fournisseur tiers ; l'interface l'indique avant l'enregistrement. Le français est demandé avec le code

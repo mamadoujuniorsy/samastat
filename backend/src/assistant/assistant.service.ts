@@ -22,7 +22,7 @@ import { buildFollowUps } from './follow-ups.js';
 import { AnswersService } from './answers.service.js';
 import { CacheService } from './cache.service.js';
 import { UsageLogService } from './usage-log.service.js';
-import { detectLanguage, normalizeWolofForSearch, searchHints, type Language } from './wolof.js';
+import { conciseWolofStatistic, detectLanguage, normalizeWolofForSearch, searchHints, type Language } from './wolof.js';
 import { TranslationService } from '../wolof/translation.service.js';
 
 const MAX_ITERATIONS = 6;
@@ -369,6 +369,13 @@ export class AssistantService {
    */
   private async wolofVersion(french: string, records: Indicator[], surveys: Survey[], state: RunState): Promise<string | null> {
     if (!this.translation.available) return null;
+    // Pour une statistique unique, une formulation contrôlée est plus fiable
+    // qu'une traduction libre et se prononce mieux par le TTS wolof.
+    if (records.length === 1 && surveys.length === 0) {
+      const concise = conciseWolofStatistic(records[0]);
+      state.emit({ kind: 'translate', label: 'Réponse wolof courte produite depuis la valeur ANSD' });
+      return concise;
+    }
     const segments = [
       ...records.flatMap((r) => [formatValue(r), r.period, r.source]),
       ...surveys.flatMap((s) => [surveyLabel(s), s.url]),

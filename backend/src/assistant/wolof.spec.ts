@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { detectLanguage, lexiconHits, normalizeWolofForSearch, searchHints } from './wolof.js';
+import { conciseWolofStatistic, detectLanguage, lexiconHits, normalizeWolofForSearch, searchHints } from './wolof.js';
 
 describe('detectLanguage', () => {
   it('reconnaît une question en français', () => {
@@ -26,6 +26,28 @@ describe('lexique', () => {
   it('trouve les formes avec et sans diacritiques', () => {
     const hits = lexiconHits('ñaata nit ñoo dekk Dakar');
     expect(hits.map((h) => h.french)).toEqual(expect.arrayContaining(['combien', 'population habitants']));
+  });
+
+  describe('réponse statistique', () => {
+    it('produit une phrase courte pour une population', () => {
+      expect(conciseWolofStatistic({
+        name: 'Population résidente',
+        value: 4004426,
+        unit: 'habitants',
+        territory: 'Dakar',
+        period: '2023',
+      })).toBe('Dakar am na 4 004 426 nit ci 2023.');
+    });
+
+    it('produit une phrase courte pour un pourcentage', () => {
+      expect(conciseWolofStatistic({
+        name: 'Taux de chômage',
+        value: 22.9,
+        unit: '%',
+        territory: 'Dakar',
+        period: '2023',
+      })).toBe('Amul liggéey ci Dakar mooy 22,9 pour cent ci 2023.');
+    });
   });
 
   it('formule des indices de recherche lisibles', () => {

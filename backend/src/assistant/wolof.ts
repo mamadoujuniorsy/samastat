@@ -6,6 +6,7 @@
  * Il ne prétend à aucune couverture complète : une question wolof hors lexique est traitée
  * comme « unknown » et le modèle fait au mieux.
  */
+import type { Indicator } from '../indicators/indicator.types.js';
 
 export type Language = 'fr' | 'wo' | 'unknown';
 
@@ -140,4 +141,30 @@ export function normalizeWolofForSearch(question: string): string {
     .replace(/\b(?:njeg|njegu)\b/gi, 'njëg')
     .replace(/\b(?:waññiku|wanñiku)\b/gi, 'wàññiku')
     .replace(/\b(?:yokku|yokkute)\b/gi, 'yokkute');
+}
+
+/**
+ * Formulation courte et contrôlée pour la synthèse vocale.
+ * Elle évite de faire traduire les réponses statistiques simples par NLLB,
+ * qui peut produire une phrase plausible mais linguistiquement incorrecte.
+ */
+export function conciseWolofStatistic(record: Pick<Indicator, 'name' | 'value' | 'unit' | 'territory' | 'period'>): string {
+  const value = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 2 }).format(record.value);
+  const name = normalize(record.name);
+  const territory = record.territory;
+  const period = record.period;
+
+  if (name.includes('chomage')) {
+    return `Amul liggéey ci ${territory} mooy ${value} pour cent ci ${period}.`;
+  }
+  if (name.includes('pauvrete')) {
+    return `Ndóol ci ${territory} mooy ${value} pour cent ci ${period}.`;
+  }
+  if (record.unit === '%') {
+    return `${record.name} ci ${territory} mooy ${value} pour cent ci ${period}.`;
+  }
+  if (record.unit.toLowerCase().includes('habitant') || name.includes('population')) {
+    return `${territory} am na ${value} nit ci ${period}.`;
+  }
+  return `${record.name} ci ${territory} mooy ${value} ${record.unit} ci ${period}.`;
 }
