@@ -47,6 +47,11 @@ WaxalNLP (AIMS Sénégal), 16 kHz, 40 à 115 Mo, moins d'une seconde par phrase 
 présente comme un point de contrôle de substitution, faute de modèle MMS natif pour le wolof. L'interface
 l'indique (« voix wolof expérimentale »).
 
+Avant synthèse, le texte est normalisé (minuscules, ponctuation simplifiée et `%` développé en
+« pour cent ») afin d'éviter que le tokenizer vocal ignore des caractères. Cette correction améliore
+la stabilité mais ne transforme pas le checkpoint proxy en voix native : si l'audio reste incompréhensible,
+il faut désactiver le bouton pour la démonstration plutôt que présenter une prononciation trompeuse.
+
 Pour les réponses statistiques à une seule valeur, SamaStat utilise en priorité une formulation wolof
 courte construite depuis l'enregistrement ANSD (`Dakar am na ... nit ci ...`) au lieu de faire traduire
 librement toute la phrase française par NLLB-200. Cela réduit les erreurs grammaticales et donne au TTS

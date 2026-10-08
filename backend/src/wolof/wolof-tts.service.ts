@@ -12,6 +12,17 @@ import { encodeWav } from './wav.js';
 export const WOLOF_TTS_MODEL = 'jaguaman09/mms-tts-wol-onnx';
 const MAX_CHARS = 400;
 
+export function prepareWolofTtsText(text: string): string {
+  return text
+    .normalize('NFC')
+    .replace(/%/g, ' pour cent ')
+    .replace(/[“”"()[\]{}:;!?]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .toLocaleLowerCase('fr-FR')
+    .slice(0, MAX_CHARS);
+}
+
 @Injectable()
 export class WolofTtsService implements OnModuleInit {
   private readonly logger = new Logger(WolofTtsService.name);
@@ -54,7 +65,7 @@ export class WolofTtsService implements OnModuleInit {
   async synthesize(text: string): Promise<Buffer | null> {
     const t = await this.get();
     if (!t) return null;
-    const clean = text.replace(/\s+/g, ' ').trim().slice(0, MAX_CHARS);
+    const clean = prepareWolofTtsText(text);
     if (!clean) return null;
     const hit = this.cache.get(clean);
     if (hit) return hit;
