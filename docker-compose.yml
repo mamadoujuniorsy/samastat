@@ -64,7 +64,7 @@ services:
       SAMASTAT_ASR_CACHE: /models
       HUGGINGFACE_HUB_TOKEN: ${HUGGINGFACE_HUB_TOKEN:-}
     ports:
-      - "8000:8000"
+      - "8001:8000"
     volumes:
       - samastat-asr-models:/models
     healthcheck:

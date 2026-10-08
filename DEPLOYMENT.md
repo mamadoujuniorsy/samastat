@@ -73,7 +73,7 @@ Les services démarrés sont :
 |---|---:|---|
 | `web` | `http://localhost:3000` | Interface web |
 | `api` | `http://localhost:3001` | API NestJS |
-| `asr` | `http://localhost:8000` | Transcription Wolof locale |
+| `asr` | `http://localhost:8001` | Transcription Wolof locale |
 | `postgres` | `localhost:5440` | PostgreSQL + pgvector |
 | `redis` | `localhost:6390` | Cache et file d'indexation |
 
@@ -114,7 +114,7 @@ et un nombre d'études supérieur à zéro.
 Vérifier aussi le service ASR local :
 
 ```bash
-curl http://localhost:8000/health
+curl http://localhost:8001/health
 ```
 
 La réponse doit indiquer `"status": "ok"`. Le champ `"loaded": false` avant le
