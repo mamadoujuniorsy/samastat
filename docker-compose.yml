@@ -41,6 +41,7 @@ services:
       REDIS_URL: redis://redis:6379
       FRONTEND_ORIGIN: http://localhost:3000
       SAMASTAT_LOCAL_ASR_URL: http://asr:8000
+      SAMASTAT_WOLOF_ASR_PROVIDER: ${SAMASTAT_WOLOF_ASR_PROVIDER:-groq}
     ports:
       - "3001:3001"
     volumes:

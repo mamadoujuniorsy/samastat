@@ -36,8 +36,8 @@ export class WolofController {
     return {
       transcription: {
         enabled: this.transcription.available,
-        provider: this.transcription.localAvailable ? 'local-kiriku' : 'groq',
-        model: this.transcription.localAvailable ? 'AIHubSN/kiriku-ASR' : 'whisper-large-v3-turbo',
+        provider: this.transcription.provider,
+        model: this.transcription.provider === 'local-kiriku' ? 'AIHubSN/kiriku-ASR' : 'whisper-large-v3-turbo',
       },
       translation: { enabled: this.translation.available, model: TRANSLATION_MODEL, licence: 'CC BY-NC 4.0' },
       tts: {

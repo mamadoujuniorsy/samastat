@@ -54,6 +54,12 @@ export class TranscriptionService {
     return Boolean(this.localAsrUrl);
   }
 
+  get provider(): 'groq' | 'local-kiriku' | 'none' {
+    if (this.apiKey && this.wolofProvider !== 'local') return 'groq';
+    if (this.localAsrUrl) return 'local-kiriku';
+    return 'none';
+  }
+
   async transcribe(
     file: { buffer: Buffer; mimetype: string; originalname?: string } | undefined,
     language: VoiceLanguage | string | undefined,
@@ -68,7 +74,7 @@ export class TranscriptionService {
     }
     const hint = parseVoiceLanguage(language);
     const localUrl = this.localAsrUrl;
-    if (localUrl && hint === 'wo') {
+    if (localUrl && hint === 'wo' && this.wolofProvider === 'local') {
       return this.transcribeLocal(file, mime, localUrl);
     }
 
@@ -131,6 +137,10 @@ export class TranscriptionService {
 
   private get localAsrUrl(): string | undefined {
     return this.config.get<string>('SAMASTAT_LOCAL_ASR_URL')?.trim() || undefined;
+  }
+
+  private get wolofProvider(): 'groq' | 'local' {
+    return this.config.get<string>('SAMASTAT_WOLOF_ASR_PROVIDER')?.trim().toLowerCase() === 'local' ? 'local' : 'groq';
   }
 
   private async transcribeLocal(
