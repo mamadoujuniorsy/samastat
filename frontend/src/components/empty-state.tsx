@@ -4,7 +4,12 @@ import type { ReactNode } from "react";
 import Link from "next/link";
 
 interface Props { composer: ReactNode; onPick: (question: string) => void }
-const examples = ["Quelle est la population du Sénégal ?", "Comment évolue l’inflation ?", "Ñaata nit ñoo dëkk Sénégal ?"];
+const examples = [
+  "Quelle est la population du Sénégal ?",
+  "Quel est le taux de chômage au Sénégal ?",
+  "Comment évolue l’inflation ?",
+  "Ñaata nit ñoo dëkk Sénégal ?",
+];
 
 export function EmptyState({ composer, onPick }: Props) {
   return <section className="mx-auto flex min-h-[calc(100dvh-3.5rem)] w-full max-w-3xl flex-col justify-center py-10 sm:py-16">
