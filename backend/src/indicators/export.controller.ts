@@ -1,5 +1,6 @@
 import { BadRequestException, Controller, Get, Header, Query, Res } from '@nestjs/common';
 import type { Response } from 'express';
+import ExcelJS from 'exceljs';
 import { IndicatorsRepository } from './indicators.repository.js';
 import type { Indicator } from './indicator.types.js';
 import { toSdmxJson } from './sdmx.js';
@@ -66,6 +67,50 @@ export class ExportController {
         .setHeader('Content-Type', 'text/csv; charset=utf-8')
         .setHeader('Content-Disposition', `attachment; filename="samastat-${stamp}.csv"`)
         .send(`﻿${lines.join('\r\n')}\r\n`);
+      return;
+    }
+
+    if (fmt === 'xlsx' || fmt === 'excel') {
+      const workbook = new ExcelJS.Workbook();
+      workbook.creator = 'SamaStat';
+      workbook.created = new Date(exportedAt);
+      workbook.subject = 'Indicateurs ANSD cités par SamaStat';
+      workbook.company = 'SamaStat';
+
+      const metadata = workbook.addWorksheet('Lisez-moi');
+      metadata.columns = [{ width: 24 }, { width: 110 }];
+      metadata.addRows([
+        ['Produit', 'SamaStat — export d’indicateurs ANSD'],
+        ['Exporté le', exportedAt],
+        ['Attribution', ATTRIBUTION],
+        ['Nombre de lignes', records.length],
+      ]);
+      metadata.getColumn(1).font = { bold: true };
+      metadata.getRow(3).getCell(2).alignment = { wrapText: true, vertical: 'top' };
+
+      const sheet = workbook.addWorksheet('Indicateurs');
+      sheet.columns = COLUMNS.map((column) => ({
+        header: column,
+        key: column,
+        width: column === 'description' || column === 'source' || column === 'url' ? 42 : 18,
+      }));
+      sheet.addRows(records.map((record) => Object.fromEntries(COLUMNS.map((column) => [column, record[column] ?? '']))));
+      sheet.views = [{ state: 'frozen', ySplit: 1 }];
+      sheet.autoFilter = { from: 'A1', to: `${String.fromCharCode(64 + COLUMNS.length)}${records.length + 1}` };
+      sheet.getRow(1).font = { bold: true, color: { argb: 'FFFFFFFF' } };
+      sheet.getRow(1).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: '155E75' } };
+      sheet.getRow(1).alignment = { vertical: 'middle' };
+      sheet.getColumn('value').numFmt = '#,##0.00';
+      sheet.eachRow((row) => {
+        row.alignment = { vertical: 'top', wrapText: true };
+      });
+
+      const buffer = await workbook.xlsx.writeBuffer();
+      res
+        .status(200)
+        .setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+        .setHeader('Content-Disposition', `attachment; filename="samastat-${stamp}.xlsx"`)
+        .send(Buffer.from(buffer));
       return;
     }
 

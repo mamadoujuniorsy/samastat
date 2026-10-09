@@ -1,5 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
+import ExcelJS from 'exceljs';
 import request from 'supertest';
 import { App } from 'supertest/types';
 import { AppModule } from './../src/app.module.js';
@@ -18,6 +19,7 @@ describe('API SamaStat (e2e)', () => {
     process.env.SAMASTAT_FALLBACK_API_KEY = '';
     process.env.SAMASTAT_WOLOF_TRANSLATION = '0';
     process.env.SAMASTAT_WOLOF_TTS = '0';
+    process.env.SOYNADE_API_KEY = '';
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
     }).compile();
@@ -52,6 +54,40 @@ describe('API SamaStat (e2e)', () => {
       .expect(200);
     expect(res.headers['content-type']).toContain('sdmx');
     expect(res.body.data.dataSets[0].series['0:0'].observations['0'][0]).toBe(5.9);
+  });
+
+  it('GET /export?format=xlsx renvoie un classeur Excel téléchargeable', async () => {
+    const res = await request(app.getHttpServer())
+      .get('/export?ids=ihpc-2023-inflation-senegal,ihpc-2024-inflation-senegal&format=xlsx')
+      .buffer(true)
+      .parse((res, callback) => {
+        const chunks: Buffer[] = [];
+        res.on('data', (chunk: Buffer) => chunks.push(chunk));
+        res.on('end', () => callback(null, Buffer.concat(chunks)));
+      })
+      .expect(200);
+    expect(res.headers['content-type']).toContain('spreadsheetml.sheet');
+    expect(res.headers['content-disposition']).toContain('.xlsx');
+    expect(res.body.subarray(0, 2).toString()).toBe('PK');
+    const workbook = new ExcelJS.Workbook();
+    await workbook.xlsx.load(res.body);
+    expect(workbook.worksheets.map((sheet) => sheet.name)).toEqual(['Lisez-moi', 'Indicateurs']);
+    expect(workbook.getWorksheet('Indicateurs')?.getRow(1).values).toEqual([
+      undefined,
+      'id',
+      'name',
+      'value',
+      'unit',
+      'territory',
+      'territory_level',
+      'period',
+      'source',
+      'platform',
+      'url',
+      'verified_at',
+      'description',
+    ]);
+    expect(workbook.getWorksheet('Indicateurs')?.getCell('B2').value).toBe("Taux d'inflation annuel (IHPC)");
   });
 
   it('GET /wolof/status indique les services inactifs en test', async () => {

@@ -318,6 +318,19 @@ Depuis un autre ordinateur, utiliser l'adresse IP du VPS :
 http://ADRESSE_IP_DU_VPS:3000
 ```
 
+Depuis une réponse contenant des indicateurs, les liens d'export permettent de
+télécharger les enregistrements cités dans plusieurs formats :
+
+- **Excel (`.xlsx`)** : classeur avec une feuille `Lisez-moi` (date et attribution)
+  et une feuille `Indicateurs` filtrable ;
+- **CSV** : séparateur `;`, encodage UTF-8 avec BOM pour une ouverture correcte
+  dans Excel ;
+- **JSON** : format structuré pour un traitement par script ;
+- **SDMX-JSON** : format d'échange statistique simplifié (`format=sdmx`).
+
+Les exports sont construits à partir des valeurs présentes dans la base, et non
+à partir du texte généré par le modèle.
+
 Cette URL suffit pour tester le site web. Aucun domaine n'est requis pour ce
 parcours local ou réseau.
 

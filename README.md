@@ -31,7 +31,7 @@ reformulations que le catalogue peut satisfaire.
 
 - Réponses en flux (SSE, `POST /ask/stream`) : les étapes réelles du traitement s'affichent au fur et à mesure (recherche, valeurs récupérées, garde anti-invention), puis se replient
 - Chiffre-vedette pour une valeur unique, barres pour plusieurs, carte des régions pour une comparaison régionale
-- Bloc Champ · Source · Vérifié le · Identifiant sous chaque valeur, actions Écouter / Copier / Citer / Partager / CSV / JSON
+- Bloc Champ · Source · Vérifié le · Identifiant sous chaque valeur, actions Écouter / Copier / Citer / Partager / CSV / Excel / JSON
 - Suites spécifiques construites depuis la base (« Et Thiès ? », « Toutes les régions », « Évolution 2023 → 2025 »)
 - Fiche partageable par indicateur (`/indicateur/:id` sur le web, feuille dans l'app) : séries par période et territoire, citation prête à copier
 - Catalogue navigable (`/catalogue`) filtrable par thème, niveau et texte
@@ -57,7 +57,7 @@ reformulations que le catalogue peut satisfaire.
 - Détection déterministe d'une évolution (même territoire, plusieurs périodes) ou d'une comparaison (même période, plusieurs territoires) parmi les enregistrements récupérés ; rendu en barres proportionnelles sur mobile et web, sans bibliothèque
 - Carte choroplèthe SVG des 14 régions (web) pour les comparaisons régionales et sur le tableau de bord, contours geoBoundaries (CC BY 4.0)
 - Partage texte (mobile) de la réponse, des valeurs, des sources et de l'attribution ; historique de session conservé dans le navigateur (web) et sur l'appareil (mobile)
-- Export CSV ou JSON des enregistrements cités (`GET /export?ids=a,b&format=csv`, liens sous chaque réponse web), avec l'attribution en en-tête
+- Export CSV, Excel (`.xlsx`) ou JSON des enregistrements cités (`GET /export?ids=a,b&format=csv|xlsx|json`, liens sous chaque réponse web), avec l'attribution et les métadonnées dans le fichier Excel
 
 ### Jalon 5 (extensions)
 

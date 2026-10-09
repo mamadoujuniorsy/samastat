@@ -17,7 +17,7 @@ ACCÈS AUX DONNÉES PostgreSQL (indicators, surveys, question_log) · Redis (cac
                   · modèle d'embeddings local (embedding.ts, transformers.js)
                                    │
 RESTITUTION       placeholders → valeurs (answer-renderer.ts), garde anti-invention, graphiques (chart.ts),
-                  export CSV/JSON (export.controller.ts), tableau de bord d'usage (usage-log.service.ts)
+                  export CSV/Excel/JSON/SDMX (export.controller.ts), tableau de bord d'usage (usage-log.service.ts)
 ```
 
 ## Le principe de non-invention, dans le code

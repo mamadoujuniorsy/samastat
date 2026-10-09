@@ -321,6 +321,9 @@ function Actions({ response }: { response: Exchange["response"] & object }) {
           <a className="underline underline-offset-4 decoration-border-strong hover:decoration-text min-h-11 inline-flex items-center" href={`/api/export?ids=${encodeURIComponent(ids)}&format=csv`}>
             CSV
           </a>
+          <a className="underline underline-offset-4 decoration-border-strong hover:decoration-text min-h-11 inline-flex items-center" href={`/api/export?ids=${encodeURIComponent(ids)}&format=xlsx`}>
+            Excel
+          </a>
           <a className="underline underline-offset-4 decoration-border-strong hover:decoration-text min-h-11 inline-flex items-center" href={`/api/export?ids=${encodeURIComponent(ids)}&format=json`}>
             JSON
           </a>
